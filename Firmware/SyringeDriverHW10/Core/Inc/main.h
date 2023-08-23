@@ -7,13 +7,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2023 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -50,8 +49,6 @@ extern "C" {
 
 /* USER CODE END EM */
 
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -60,19 +57,50 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define PWRKEY_Pin GPIO_PIN_1
-#define PWRKEY_GPIO_Port GPIOA
-#define BAT_CUR_Pin GPIO_PIN_4
-#define BAT_CUR_GPIO_Port GPIOA
-#define BAT_VOLT_Pin GPIO_PIN_5
-#define BAT_VOLT_GPIO_Port GPIOA
-#define MOT_CUR_Pin GPIO_PIN_6
-#define MOT_CUR_GPIO_Port GPIOA
-#define NEAREND_Pin GPIO_PIN_7
-#define NEAREND_GPIO_Port GPIOA
-#define SWITCHFB_Pin GPIO_PIN_10
-#define SWITCHFB_GPIO_Port GPIOA
-
+#define KeySS_Pin GPIO_PIN_13
+#define KeySS_GPIO_Port GPIOC
+#define KeyPower_Pin GPIO_PIN_1
+#define KeyPower_GPIO_Port GPIOA
+#define SegNum2_Pin GPIO_PIN_2
+#define SegNum2_GPIO_Port GPIOA
+#define SegNum1_Pin GPIO_PIN_3
+#define SegNum1_GPIO_Port GPIOA
+#define BatCur_Pin GPIO_PIN_4
+#define BatCur_GPIO_Port GPIOA
+#define MotCur_Pin GPIO_PIN_5
+#define MotCur_GPIO_Port GPIOA
+#define NearEnd_Pin GPIO_PIN_6
+#define NearEnd_GPIO_Port GPIOA
+#define BatVolt_Pin GPIO_PIN_7
+#define BatVolt_GPIO_Port GPIOA
+#define SegA_Pin GPIO_PIN_0
+#define SegA_GPIO_Port GPIOB
+#define SegB_Pin GPIO_PIN_1
+#define SegB_GPIO_Port GPIOB
+#define SegC_Pin GPIO_PIN_2
+#define SegC_GPIO_Port GPIOB
+#define LedBat_Pin GPIO_PIN_12
+#define LedBat_GPIO_Port GPIOB
+#define SwitchFB_Pin GPIO_PIN_15
+#define SwitchFB_GPIO_Port GPIOB
+#define LedAlarm_Pin GPIO_PIN_11
+#define LedAlarm_GPIO_Port GPIOA
+#define LedSS_Pin GPIO_PIN_12
+#define LedSS_GPIO_Port GPIOA
+#define SegD_Pin GPIO_PIN_3
+#define SegD_GPIO_Port GPIOB
+#define SegE_Pin GPIO_PIN_4
+#define SegE_GPIO_Port GPIOB
+#define SegF_Pin GPIO_PIN_5
+#define SegF_GPIO_Port GPIOB
+#define SegG_Pin GPIO_PIN_6
+#define SegG_GPIO_Port GPIOB
+#define SegDP_Pin GPIO_PIN_7
+#define SegDP_GPIO_Port GPIOB
+#define KeyTime_Pin GPIO_PIN_8
+#define KeyTime_GPIO_Port GPIOB
+#define KeyType_Pin GPIO_PIN_9
+#define KeyType_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
