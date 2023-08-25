@@ -121,7 +121,7 @@ int main(void)
 		}
 		else if(isKeyHold(KeySS))
 		{
-			HAL_GPIO_WritePin(SegNum1_GPIO_Port,SegNum1_Pin,GPIO_PIN_SET);
+			HAL_GPIO_TogglePin(SegNum1_GPIO_Port,SegNum1_Pin);
 		}
   }
   /* USER CODE END 3 */
