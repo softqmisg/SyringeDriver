@@ -42,18 +42,22 @@
 #define KEY01							0x0002
 #define KEY02							0x0004
 #define KEY03							0x0008
-//#define KEY04							0x0010
-//#define KEY05							0x0020
-//#define KEY06							0x0040
-//#define KEY07							0x0080
-//#define KEY08							0x0100
-//#define KEY09							0x0200
-//#define KEY10							0x0400
-//#define KEY11							0x0800
-//#define KEY12							0x1000
-//#define KEY13							0x2000
-//#define KEY14							0x4000
-#define KEYLONG							0x8000
+#define KEY04							0x0010
+#define KEY05							0x0020
+#define KEY06							0x0040
+#define KEY07							0x0080
+#define KEY08							0x0100
+#define KEY09							0x0200
+#define KEY10							0x0400
+#define KEY11							0x0800
+#define KEY12							0x1000
+#define KEY13							0x2000
+#define KEY14							0x4000
+#define KEYLONG						0x8000
+
+//----enum key state
+
+typedef enum {KEYPRESS,KEYDOWN,KEYRELEASE} tKeyState;
 
 //----user Key Definition
 
@@ -77,11 +81,14 @@
 #define KEY03_pin				KeyType_Pin
 #define KEY03_active		GPIO_PIN_RESET
 
-
+//#define KeyFB						KEY04
+//#define KEY04_port			SwitchFB_GPIO_Port
+//#define KEY04_pin				SwitchFB_Pin
+//#define KEY04_active		GPIO_PIN_SET
 //-- Prototypes.
 void keypadRead(void);
 uint8_t isKeyDown(uint16_t m); // Key(s) is just down.
 uint8_t isKeyPress(uint16_t m); // Key(s) is pressed.
 uint8_t isKeyHold(uint16_t m); // Key(s) is held down.
-
+tKeyState KeyState(uint16_t m);
 #endif

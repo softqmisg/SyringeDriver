@@ -64,7 +64,7 @@ uint16_t keypadSerialize(void) {
 	result |= (mPinRead(KEY03_port,KEY03_pin) == KEY03_active) ? KEY03 : 0;
 #endif
 #ifdef KEY04_pin
-	result |= (mPinRead(KEY04_pin) == KEY04_active) ? KEY04 : 0;
+	result |= (mPinRead(KEY04_port,KEY04_pin) == KEY04_active) ? KEY04 : 0;
 #endif
 #ifdef KEY05_pin
 	result |= (mPinRead(KEY05_pin) == KEY05_active) ? KEY05 : 0;
@@ -164,3 +164,10 @@ uint8_t isKeyHold(uint16_t m) {
 	return ((keypad.keysReleased == (m | KEYLONG)));
 }
 
+tKeyState KeyState(uint16_t m)
+{
+		if(isKeyDown(m))
+			return KEYDOWN;
+		else
+			return KEYRELEASE;	
+}
