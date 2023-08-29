@@ -85,7 +85,11 @@ enum {UpState,RunState} state=UpState;
 static __IO uint32_t TimingDelay=0;
 void HAL_SYSTICK_Callback(void)
 {	
-	if(state==UpState)
+	if(state==RunState)
+	{
+		HAL_GPIO_TogglePin(LedSS_GPIO_Port,LedBat_Pin);
+	}
+	else if(state==UpState)
 	{
 		if(TimingDelay!=0)
 		{
@@ -93,35 +97,31 @@ void HAL_SYSTICK_Callback(void)
 		}
 		else
 		{
-			HAL_GPIO_TogglePin(LedBat_GPIO_Port,LedBat_Pin);
+			HAL_GPIO_TogglePin(LedSS_GPIO_Port,LedSS_Pin);
 			TimingDelay = LED_TOGGLE_DELAY;		
 		}
 	}	
 }
 //-----------------------------------------------------
 static __IO uint8_t awu_wakup_cnt=0;
+__IO uint8_t awu_wakup=0;
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	RTC_TimeTypeDef sTime = {0};
 	SYSCLKConfig_FromSTOP();
-	HAL_ResumeTick();
+	//HAL_ResumeTick();
 	awu_wakup_cnt++;
 	if(awu_wakup_cnt>7) awu_wakup_cnt=0;
-  if (HAL_RTC_SetTime(hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
-  {
-    Error_Handler();
-  }	
-	HAL_GPIO_TogglePin(LedSS_GPIO_Port,LedSS_Pin );	
-	
+		awu_wakup=1;
 }
 //-----------------------------------------------------
 void HAL_GPIO_EXTI_Callback(uint16_t gpio_pin)
 {
+		keypadRead();		
 	if(gpio_pin==KeySS_Pin || gpio_pin ==KeyPower_Pin)
 	{
 		SYSCLKConfig_FromSTOP();
-		keypadRead();		
-		HAL_ResumeTick();
+		//HAL_ResumeTick();
 		HAL_GPIO_WritePin(LedAlarm_GPIO_Port,LedAlarm_Pin,GPIO_PIN_SET);
 		HAL_PWR_DisableSleepOnExit();
 	}
@@ -151,9 +151,9 @@ void gotoStopMode(void)
   RTC_AlarmTypeDef  RTC_AlarmStruct;
   RTC_AlarmStruct.AlarmTime.Hours=0x00;
 	RTC_AlarmStruct.AlarmTime.Minutes=0x00;
-	RTC_AlarmStruct.AlarmTime.Seconds=20;
+	RTC_AlarmStruct.AlarmTime.Seconds=10;
 	RTC_AlarmStruct.Alarm=RTC_ALARM_A;
-//  HAL_RTC_SetAlarm_IT(&hrtc, &RTC_AlarmStruct,RTC_FORMAT_BIN);
+  HAL_RTC_SetAlarm_IT(&hrtc, &RTC_AlarmStruct,RTC_FORMAT_BIN);
 
 	HAL_GPIO_WritePin(LedBat_GPIO_Port,LedBat_Pin,GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(LedAlarm_GPIO_Port,LedAlarm_Pin,GPIO_PIN_RESET);
@@ -165,10 +165,14 @@ void gotoStopMode(void)
 	HAL_GPIO_WritePin(SegA_GPIO_Port,SegA_Pin,GPIO_PIN_SET);
 	HAL_GPIO_WritePin(SegB_GPIO_Port,SegB_Pin,GPIO_PIN_SET);
 	keypadRead();
-	HAL_SuspendTick();
-	HAL_PWR_EnableSleepOnExit();
+//after stop clock source is 32768 for 2S interrupt,reload value is 2*32768=65536=	0x10000
+//	HAL_SYSTICK_Config(6553); 
+	//HAL_SuspendTick();
+//	HAL_PWR_EnableSleepOnExit();
 	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON,PWR_STOPENTRY_WFI);
 	HAL_RTC_DeactivateAlarm(&hrtc,RTC_ALARM_A);
+	HAL_SYSTICK_Config(SystemCoreClock / (1000U / uwTickFreq)); //1Khz
+	__HAL_CORTEX_SYSTICKCLK_CONFIG(SYSTICK_CLKSOURCE_HCLK);
 
 }
 
@@ -208,7 +212,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
-
+	RTC_TimeTypeDef sTime = {0};
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -221,9 +225,41 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-#if 1		
+		
+#if 1
+		if(awu_wakup)
+		{
+			awu_wakup=0;
+			HAL_GPIO_WritePin(LedBat_GPIO_Port,LedBat_Pin,GPIO_PIN_SET);	
+			HAL_Delay(30);
+			HAL_GPIO_WritePin(LedBat_GPIO_Port,LedBat_Pin,GPIO_PIN_RESET);	
+			if(awu_wakup_cnt==3)
+			{
+				SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);
+				HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
+				__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,50-1);			
+				HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
+				while(SwitchFB_prvState==HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin));
+				HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_2);
+				HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_1);
+				HAL_GPIO_WritePin(LedSS_GPIO_Port,LedSS_Pin,GPIO_PIN_RESET);		
+			}
+			if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+			{
+				Error_Handler();
+			}				
+			state=RunState;
+			gotoStopMode();			
+		}
 		if(isKeyPress(KeySS) && state==UpState)  //goto stop
 		{
+			HAL_GPIO_WritePin(LedBat_GPIO_Port,LedBat_Pin,GPIO_PIN_SET);
+			HAL_Delay(30);
+			HAL_GPIO_WritePin(LedBat_GPIO_Port,LedBat_Pin,GPIO_PIN_RESET);
+			if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+			{
+				Error_Handler();
+			}			
 			state=RunState;
 			gotoStopMode();
 		}
@@ -247,6 +283,10 @@ int main(void)
 			HAL_GPIO_WritePin(SegA_GPIO_Port,SegA_Pin,GPIO_PIN_RESET);	
 			HAL_GPIO_WritePin(SegNum1_GPIO_Port,SegNum1_Pin,GPIO_PIN_RESET);	
 			HAL_Delay(3000);
+			if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+			{
+				Error_Handler();
+			}					
 			state=RunState;
 			gotoStopMode();
 		}
