@@ -214,7 +214,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 		 GPIO_PinState SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);
-	
+	HAL_ADC_PollForConversion
   while (1)
   {
 		keypadRead();
@@ -261,39 +261,7 @@ int main(void)
 		}
 
 #endif
-//#if 0
-//		if(isKeyPress(KeyType))
-//		{
-//			HAL_GPIO_TogglePin(SegA_GPIO_Port,SegA_Pin);
-//			HAL_GPIO_WritePin(SegNum1_GPIO_Port,SegNum1_Pin,GPIO_PIN_RESET);
-//		}
-//		else if(isKeyHold(KeyType))
-//		{
-//			HAL_GPIO_TogglePin(SegNum1_GPIO_Port,SegNum1_Pin);
-//		}
-//		else if(isKeyPress(KeySS))
-//		{
-////			HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
-////			__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,50-1);			
-////			HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
-////			HAL_GPIO_WritePin(LedSS_GPIO_Port,LedSS_Pin,GPIO_PIN_SET);
-//			
-//		}
-//		else if(isKeyHold(KeySS))
-//		{
-//			HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
-//			__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,50-1);			
-//			HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
-//			HAL_GPIO_WritePin(LedSS_GPIO_Port,LedSS_Pin,GPIO_PIN_SET);			
-//		}		
-//		if(SwitchFB_prvState!=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin))
-//		{
-//			HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_2);
-//			HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_1);
-//			HAL_GPIO_WritePin(LedSS_GPIO_Port,LedSS_Pin,GPIO_PIN_RESET);		
-//			SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);		
-//		}
-//#endif
+
   }
   /* USER CODE END 3 */
 }
