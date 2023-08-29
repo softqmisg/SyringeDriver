@@ -10,6 +10,7 @@
 "syringedriverhw10_keil\usart.o"
 "syringedriverhw10_keil\stm32f1xx_it.o"
 "syringedriverhw10_keil\stm32f1xx_hal_msp.o"
+"syringedriverhw10_keil\stdout_user.o"
 "syringedriverhw10_keil\stm32f1xx_hal_gpio_ex.o"
 "syringedriverhw10_keil\stm32f1xx_hal_adc.o"
 "syringedriverhw10_keil\stm32f1xx_hal_adc_ex.o"
@@ -29,6 +30,7 @@
 "syringedriverhw10_keil\stm32f1xx_hal_tim_ex.o"
 "syringedriverhw10_keil\stm32f1xx_hal_uart.o"
 "syringedriverhw10_keil\system_stm32f1xx.o"
+"syringedriverhw10_keil\retarget_io.o"
 --strict --scatter "SyringeDriverHW10_Keil\SyringeDriverHW10_Keil.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
