@@ -39,5 +39,6 @@ syringedriverhw10_keil/keypad.o: ..\Core\Src\keypad.c \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_utils.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_cortex.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_pwr.h \
+  ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_adc.h \
   ..\Core\Inc\user_punc.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h

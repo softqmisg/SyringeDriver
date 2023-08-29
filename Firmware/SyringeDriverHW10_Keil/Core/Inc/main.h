@@ -37,6 +37,7 @@ extern "C" {
 #include "stm32f1xx_ll_utils.h"
 #include "stm32f1xx_ll_cortex.h"
 #include "stm32f1xx_ll_pwr.h"
+#include "stm32f1xx_ll_adc.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

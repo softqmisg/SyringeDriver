@@ -37,4 +37,5 @@ syringedriverhw10_keil/tim.o: ..\Core\Src\tim.c ..\Core\Inc\tim.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_system.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_utils.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_cortex.h \
-  ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_pwr.h
+  ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_pwr.h \
+  ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_adc.h

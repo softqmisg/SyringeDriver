@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dma.h"
 #include "rtc.h"
 #include "tim.h"
 #include "usart.h"
@@ -26,7 +27,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <keypad.h>
+#include <stdio.h>
+#include "keypad.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -99,6 +101,12 @@ void HAL_SYSTICK_Callback(void)
 	}	
 }
 //-----------------------------------------------------
+__IO uint8_t cnvCompleted=0;
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+	cnvCompleted=1;
+}
+//-----------------------------------------------------
 static __IO uint8_t awu_wakup_cnt=0;
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
@@ -169,8 +177,11 @@ void gotoStopMode(void)
 	HAL_PWR_EnableSleepOnExit();
 	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON,PWR_STOPENTRY_WFI);
 	HAL_RTC_DeactivateAlarm(&hrtc,RTC_ALARM_A);
-
+	
 }
+
+/******************************************************************************/
+uint16_t rawValues[4];
 
 /* USER CODE END 0 */
 
@@ -202,6 +213,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
@@ -209,12 +221,49 @@ int main(void)
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 
+		HAL_ADCEx_Calibration_Start(&hadc1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-		 GPIO_PinState SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);
-	HAL_ADC_PollForConversion
+	cnvCompleted=0;
+	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)rawValues,4);
+	HAL_ADC_Start(&hadc1);
+
+GPIO_PinState SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);;
+//	while(1)
+//	{
+//		keypadRead();
+//		if(isKeyPress(KeySS))
+//		{
+//				SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);				
+//			HAL_GPIO_TogglePin(LedAlarm_GPIO_Port,LedAlarm_Pin);
+//				HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
+//				__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,80-1);			
+//				HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);						
+//			
+//		}
+//		if(isKeyPress(KeyPower))//SwitchFB_prvState!=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin))
+//		{
+//				HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_2);
+//				HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_1);			
+//				SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);
+//		}
+////		if(cnvCompleted)
+////		{
+////			cnvCompleted=0;
+////			for(uint8_t i=0;i< hadc1.Init.NbrOfConversion;i++)
+////			{
+////				printf("IN%d:%d\r\n",i+4,rawValues[i]);
+////			}
+////			printf("=============\r\n");
+////			HAL_Delay(3000);
+////			HAL_ADC_Start(&hadc1);
+////		}
+//			
+//	}
+//	
+
   while (1)
   {
 		keypadRead();
