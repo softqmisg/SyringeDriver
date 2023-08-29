@@ -27,7 +27,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <keypad.h>
+#include "keypad.h"
+#include "user_buzzer.h"
+#include "Tones_Pitches.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,38 +56,23 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+__STATIC_INLINE void SYSCLKConfig_FromSTOP(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // ---------------------------------------------------------------
-__STATIC_INLINE void SYSCLKConfig_FromSTOP(void)
-{
-  /* Customize process using LL interface to improve the performance 
-     (wake-up time from STOP quicker in LL than HAL)*/  
-  /* HSE configuration and activation */
-  LL_RCC_HSI_Enable();
-  while(LL_RCC_HSI_IsReady() != 1) {};
 
-  /* Main PLL activation */
-  LL_RCC_PLL_Enable();
-  while(LL_RCC_PLL_IsReady() != 1) 
-  {
-  };
-  
-  /* SYSCLK activation on the main PLL */
-  LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
-  while(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL) 
-  {
-  };
-}
 // ----------------------Systick callback-----------------------------------------
 enum {UpState,RunState} state=UpState;
 #define LED_TOGGLE_DELAY	100 //2000*1ms=2s
 static __IO uint32_t TimingDelay=0;
+extern uint8_t playState;
 void HAL_SYSTICK_Callback(void)
 {	
+	//-------------------------------------------------------//
+
+	//-------------------------------------------------------//
 	if(state==UpState)
 	{
 		if(TimingDelay!=0)
@@ -209,6 +196,7 @@ int main(void)
   MX_TIM2_Init();
   MX_USART3_UART_Init();
   MX_RTC_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -216,19 +204,27 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 		 GPIO_PinState SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);
-	
+	uint16_t freqs[]={262,262,TONES_END};
+	uint16_t durs[]={2000,4000,0};
+//	uint16_t freqs[]= {NOTE_A3, NOTE_REST, NOTE_A4, NOTE_A5,  TONES_REPEAT};
+//	uint16_t durs[]={1000, 250, 500, 2000,  TONES_REPEAT};
+
   while (1)
   {
 		keypadRead();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-#if 1		
+
 		if(isKeyPress(KeySS) && state==UpState)  //goto stop
 		{
-			state=RunState;
-			gotoStopMode();
+			play_tone(freqs,durs,3);
 		}
+		if(isKeyPress(KeyPower))
+		{
+			mute_tone();
+		}
+#if 0				
 		 if(isKeyPress(KeySS)&& state==RunState)
 		{
 			HAL_GPIO_WritePin(SegDP_GPIO_Port,SegDP_Pin,GPIO_PIN_RESET);	
@@ -348,7 +344,27 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+__STATIC_INLINE void SYSCLKConfig_FromSTOP(void)
 
+{
+  /* Customize process using LL interface to improve the performance 
+     (wake-up time from STOP quicker in LL than HAL)*/  
+  /* HSE configuration and activation */
+  LL_RCC_HSI_Enable();
+  while(LL_RCC_HSI_IsReady() != 1) {};
+
+  /* Main PLL activation */
+  LL_RCC_PLL_Enable();
+  while(LL_RCC_PLL_IsReady() != 1) 
+  {
+  };
+  
+  /* SYSCLK activation on the main PLL */
+  LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
+  while(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL) 
+  {
+  };
+}
 /* USER CODE END 4 */
 
 /**

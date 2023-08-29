@@ -1,5 +1,5 @@
-syringedriverhw10_keil/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
-  ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h \
+syringedriverhw10_keil/dma.o: ..\Core\Src\dma.c ..\Core\Inc\dma.h \
+  ..\Core\Inc\main.h ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h \
   ..\Core\Inc\stm32f1xx_hal_conf.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_rcc.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_def.h \
@@ -37,8 +37,4 @@ syringedriverhw10_keil/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_system.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_utils.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_cortex.h \
-  ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_pwr.h \
-  ..\Core\Inc\adc.h ..\Core\Inc\dma.h ..\Core\Inc\rtc.h \
-  ..\Core\Inc\tim.h ..\Core\Inc\usart.h ..\Core\Inc\gpio.h \
-  ..\Core\Inc\keypad.h ..\Core\Inc\user_buzzer.h \
-  ..\Core\Inc\Tones_Pitches.h
+  ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_pwr.h
