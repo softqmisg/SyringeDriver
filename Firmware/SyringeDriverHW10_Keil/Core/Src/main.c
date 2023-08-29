@@ -228,41 +228,45 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	cnvCompleted=0;
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)rawValues,4);
-	HAL_ADC_Start(&hadc1);
+	//HAL_ADC_Start(&hadc1);
 
 GPIO_PinState SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);;
-//	while(1)
-//	{
-//		keypadRead();
-//		if(isKeyPress(KeySS))
-//		{
-//				SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);				
-//			HAL_GPIO_TogglePin(LedAlarm_GPIO_Port,LedAlarm_Pin);
-//				HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
-//				__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,80-1);			
-//				HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);						
-//			
-//		}
-//		if(isKeyPress(KeyPower))//SwitchFB_prvState!=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin))
-//		{
-//				HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_2);
-//				HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_1);			
-//				SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);
-//		}
-////		if(cnvCompleted)
-////		{
-////			cnvCompleted=0;
-////			for(uint8_t i=0;i< hadc1.Init.NbrOfConversion;i++)
-////			{
-////				printf("IN%d:%d\r\n",i+4,rawValues[i]);
-////			}
-////			printf("=============\r\n");
-////			HAL_Delay(3000);
-////			HAL_ADC_Start(&hadc1);
-////		}
-//			
-//	}
-//	
+	while(1)
+	{
+		keypadRead();
+		if(isKeyPress(KeySS))
+		{
+				SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);				
+			HAL_GPIO_TogglePin(LedAlarm_GPIO_Port,LedAlarm_Pin);
+				HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
+				__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,80-1);			
+				HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);						
+			
+		}
+		if(isKeyPress(KeyPower))//SwitchFB_prvState!=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin))
+		{
+				HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_2);
+				HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_1);			
+				SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);
+		}
+		if(cnvCompleted)
+		{
+			cnvCompleted=0;
+			printf("BatCur:%.2f (mA)\r\n",(double)rawValues[0]*1.611);
+			printf("MotCur:%.2f(mA)\r\n",(double)rawValues[1]*1.611);
+			printf("NeadEndV:%.1f (mv)\r\n",(double)rawValues[2]*0.363);
+			printf("BatVolt:%.1f (mv)\r\n",(double)rawValues[3]*4.59);
+//			for(uint8_t i=0;i< hadc1.Init.NbrOfConversion;i++)
+//			{
+//				printf("IN%d:%d\r\n",i+4,rawValues[i]);
+//			}
+			printf("=============\r\n");
+			HAL_Delay(300);
+			//HAL_ADC_Start(&hadc1);
+		}
+			
+	}
+	
 
   while (1)
   {
