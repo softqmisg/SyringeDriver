@@ -48,6 +48,13 @@ typedef struct {
 // Initialize the variables.
 tKeypad keypad = { .keysPressed = 0, .keysDown = 0, .keysReleased = 0, .counterBoost = 0, };
 
+void keypadInit(void)
+{
+	keypad.keysPressed=0;
+	keypad.keysDown=0;
+	keypad.keysReleased=0;
+	keypad.counterBoost=0;
+}
 // This function reads the pin values and writes to bits of a variable.
 uint16_t keypadSerialize(void) {
 	uint16_t result = 0;

@@ -31,10 +31,10 @@
 
 #include "main.h"
 //-- Settings.
-#define KEY_DEBOUNCE_TIME								50UL
+#define KEY_DEBOUNCE_TIME								5UL
 #define KEY_LONGPRESS_TIME							1000UL
-#define KEY_LONGPRESS_REPEAT_TIME				1000UL //1000UL
-#define KEY_LONGPRESS_BOOST_TIME				50UL
+#define KEY_LONGPRESS_REPEAT_TIME				0 //1000UL
+#define KEY_LONGPRESS_BOOST_TIME				KEY_LONGPRESS_TIME//50UL
 #define KEY_LONGPRESS_BOOST_THRESHOLD		8
 
 //-- Definitions (DONT TOUCH)
@@ -86,6 +86,7 @@ typedef enum {KEYPRESS,KEYDOWN,KEYRELEASE} tKeyState;
 //#define KEY04_pin				SwitchFB_Pin
 //#define KEY04_active		GPIO_PIN_SET
 //-- Prototypes.
+void keypadInit(void);
 void keypadRead(void);
 uint8_t isKeyDown(uint16_t m); // Key(s) is just down.
 uint8_t isKeyPress(uint16_t m); // Key(s) is pressed.
