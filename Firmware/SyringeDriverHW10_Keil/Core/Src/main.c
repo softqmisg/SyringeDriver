@@ -233,11 +233,11 @@ int main(void)
 			HAL_GPIO_WritePin(LedBat_GPIO_Port,LedBat_Pin,GPIO_PIN_SET);	
 			HAL_Delay(30);
 			HAL_GPIO_WritePin(LedBat_GPIO_Port,LedBat_Pin,GPIO_PIN_RESET);	
-			if(awu_wakup_cnt==3)
+			if(1)//awu_wakup_cnt==3)
 			{
 				SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);
 				HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
-				__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,50-1);			
+				__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,80-1);			
 				HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
 				while(SwitchFB_prvState==HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin));
 				HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_2);
