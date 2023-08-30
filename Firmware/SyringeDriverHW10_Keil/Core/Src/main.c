@@ -27,6 +27,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <keypad.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -80,14 +81,14 @@ __STATIC_INLINE void SYSCLKConfig_FromSTOP(void)
   };
 }
 // ----------------------Systick callback-----------------------------------------
-enum {UpState,RunState} state=UpState;
+enum {NoneState,UpState,RunState} state=NoneState;
 #define LED_TOGGLE_DELAY	100 //2000*1ms=2s
 static __IO uint32_t TimingDelay=0;
 void HAL_SYSTICK_Callback(void)
 {	
 	if(state==RunState)
 	{
-		HAL_GPIO_TogglePin(LedSS_GPIO_Port,LedBat_Pin);
+		HAL_GPIO_WritePin(LedSS_GPIO_Port,LedSS_Pin,GPIO_PIN_RESET);
 	}
 	else if(state==UpState)
 	{
@@ -171,11 +172,27 @@ void gotoStopMode(void)
 //	HAL_PWR_EnableSleepOnExit();
 	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON,PWR_STOPENTRY_WFI);
 	HAL_RTC_DeactivateAlarm(&hrtc,RTC_ALARM_A);
-	HAL_SYSTICK_Config(SystemCoreClock / (1000U / uwTickFreq)); //1Khz
-	__HAL_CORTEX_SYSTICKCLK_CONFIG(SYSTICK_CLKSOURCE_HCLK);
+//	HAL_SYSTICK_Config(SystemCoreClock / (1000U / uwTickFreq)); //1Khz
+//	__HAL_CORTEX_SYSTICKCLK_CONFIG(SYSTICK_CLKSOURCE_HCLK);
 
 }
+// ---------------------------------------------------------------
+void gotoStandByMode(void)
+{
+	  /* Disable all used wakeup sources: PWR_WAKEUP_PIN1 */
+  HAL_PWR_DisableWakeUpPin(PWR_WAKEUP_PIN1);
 
+  /* Clear all related wakeup flags*/
+  __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+  	state=RunState;
+	HAL_Delay(1000);
+  	printf("Bye!goto standby\r\n");
+	/* Enable WakeUp Pin PWR_WAKEUP_PIN1 connected to PA.00 */
+  HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);	
+  /* Enter the Standby mode */
+  HAL_PWR_EnterSTANDBYMode();
+	
+}
 /* USER CODE END 0 */
 
 /**
@@ -213,6 +230,20 @@ int main(void)
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 	RTC_TimeTypeDef sTime = {0};
+	uint8_t wakeupstate=0;
+			keypadRead();
+  if (__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
+  {
+    /* Clear Standby flag */
+    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU|PWR_FLAG_SB);
+			printf("hello!wake up from standby\r\n");
+			wakeupstate=1;
+  }	
+	else
+	{
+		printf("hello!\r\n");
+		state=UpState;
+	}
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -225,8 +256,19 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		
-#if 1
+		if(isKeyHold(KeyPower))
+		{
+			if(wakeupstate)
+			{
+				wakeupstate=0;
+				state=UpState;
+			}
+			else
+			{
+				gotoStandByMode();
+			}
+		}
+#if 0
 		if(awu_wakup)
 		{
 			awu_wakup=0;
