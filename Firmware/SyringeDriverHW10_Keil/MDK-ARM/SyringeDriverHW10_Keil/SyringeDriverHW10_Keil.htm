@@ -3,7 +3,7 @@
 <title>Static Call Graph - [SyringeDriverHW10_Keil\SyringeDriverHW10_Keil.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image SyringeDriverHW10_Keil\SyringeDriverHW10_Keil.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Wed Aug 30 01:08:55 2023
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Wed Aug 30 10:06:11 2023
 <BR><P>
 <H3>Maximum Stack Usage =        236 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -763,7 +763,8 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[98]"></a>HAL_TIM_GenerateEvent</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_GenerateEvent))
-<BR><BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone
+<BR><BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone_reverse
+<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone
 </UL>
 
 <P><STRONG><a name="[72]"></a>HAL_TIM_IC_CaptureCallback</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_IC_CaptureCallback))
@@ -773,13 +774,13 @@ Global Symbols
 <P><STRONG><a name="[70]"></a>HAL_TIM_IRQHandler</STRONG> (Thumb, 368 bytes, Stack size 8 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = HAL_TIM_IRQHandler &rArr; HAL_TIM_OC_DelayElapsedCallback &rArr; HAL_TIM_OC_Stop_IT
 </UL>
-<BR>[Calls]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IC_CaptureCallback
-<LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_PulseFinishedCallback
+<BR>[Calls]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_PulseFinishedCallback
 <LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
 <LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_OC_DelayElapsedCallback
 <LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_TriggerCallback
 <LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIMEx_BreakCallback
 <LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIMEx_CommutCallback
+<LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IC_CaptureCallback
 </UL>
 <BR>[Called By]<UL><LI><a href="#[27]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM3_IRQHandler
 </UL>
@@ -790,7 +791,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_TIM3_Init
 </UL>
 
-<P><STRONG><a name="[76]"></a>HAL_TIM_OC_DelayElapsedCallback</STRONG> (Thumb, 214 bytes, Stack size 8 bytes, user_buzzer.o(.text.HAL_TIM_OC_DelayElapsedCallback))
+<P><STRONG><a name="[76]"></a>HAL_TIM_OC_DelayElapsedCallback</STRONG> (Thumb, 436 bytes, Stack size 8 bytes, user_buzzer.o(.text.HAL_TIM_OC_DelayElapsedCallback))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = HAL_TIM_OC_DelayElapsedCallback &rArr; HAL_TIM_OC_Stop_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[79]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_OC_Stop_IT
@@ -812,14 +813,14 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[97]"></a>HAL_TIM_OC_Start_IT</STRONG> (Thumb, 280 bytes, Stack size 0 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_OC_Start_IT))
-<BR><BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone
+<BR><BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone_reverse
+<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone
 </UL>
 
 <P><STRONG><a name="[79]"></a>HAL_TIM_OC_Stop_IT</STRONG> (Thumb, 190 bytes, Stack size 8 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_OC_Stop_IT))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = HAL_TIM_OC_Stop_IT
 </UL>
-<BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mute_tone
-<LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_OC_DelayElapsedCallback
+<BR>[Called By]<UL><LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_OC_DelayElapsedCallback
 </UL>
 
 <P><STRONG><a name="[88]"></a>HAL_TIM_PWM_ConfigChannel</STRONG> (Thumb, 524 bytes, Stack size 28 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_PWM_ConfigChannel))
@@ -849,14 +850,14 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[96]"></a>HAL_TIM_PWM_Start</STRONG> (Thumb, 222 bytes, Stack size 0 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_PWM_Start))
-<BR><BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone
+<BR><BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone_reverse
+<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone
 </UL>
 
 <P><STRONG><a name="[78]"></a>HAL_TIM_PWM_Stop</STRONG> (Thumb, 178 bytes, Stack size 8 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_PWM_Stop))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = HAL_TIM_PWM_Stop
 </UL>
-<BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mute_tone
-<LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_OC_DelayElapsedCallback
+<BR>[Called By]<UL><LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_OC_DelayElapsedCallback
 </UL>
 
 <P><STRONG><a name="[73]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_PeriodElapsedCallback))
@@ -1056,7 +1057,7 @@ Global Symbols
 <LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_EXTI_Callback
 </UL>
 
-<P><STRONG><a name="[40]"></a>main</STRONG> (Thumb, 290 bytes, Stack size 80 bytes, main.o(.text.main))
+<P><STRONG><a name="[40]"></a>main</STRONG> (Thumb, 284 bytes, Stack size 80 bytes, main.o(.text.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 236<LI>Call Chain = main &rArr; MX_TIM1_Init &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_TIM3_Init
@@ -1071,8 +1072,8 @@ Global Symbols
 <LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_ClockConfig
 <LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_OscConfig
 <LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Init
-<LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone
-<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mute_tone
+<LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone_reverse
+<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;play_tone
 <LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;isKeyPress
 <LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keypadRead
 <LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_ReadPin
@@ -1080,17 +1081,18 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[3f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[95]"></a>mute_tone</STRONG> (Thumb, 34 bytes, Stack size 8 bytes, user_buzzer.o(.text.mute_tone))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = mute_tone &rArr; HAL_TIM_OC_Stop_IT
+<P><STRONG><a name="[95]"></a>play_tone</STRONG> (Thumb, 80 bytes, Stack size 8 bytes, user_buzzer.o(.text.play_tone))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = play_tone
 </UL>
-<BR>[Calls]<UL><LI><a href="#[79]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_OC_Stop_IT
-<LI><a href="#[78]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Stop
+<BR>[Calls]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_GenerateEvent
+<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_OC_Start_IT
+<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Start
 </UL>
 <BR>[Called By]<UL><LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[94]"></a>play_tone</STRONG> (Thumb, 72 bytes, Stack size 8 bytes, user_buzzer.o(.text.play_tone))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = play_tone
+<P><STRONG><a name="[94]"></a>play_tone_reverse</STRONG> (Thumb, 218 bytes, Stack size 8 bytes, user_buzzer.o(.text.play_tone_reverse))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = play_tone_reverse
 </UL>
 <BR>[Calls]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_GenerateEvent
 <LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_OC_Start_IT

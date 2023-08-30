@@ -204,11 +204,15 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 		 GPIO_PinState SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);
-	uint16_t freqs[]={262,262,TONES_END};
-	uint16_t durs[]={2000,4000,0};
+//	uint16_t freqs[]={2349,2349,2637,2349,3136,2794,NOTE_REST,TONES_REPEAT};
+//	uint16_t durs[]={125,62,250,250,250,500,500,0};
 //	uint16_t freqs[]= {NOTE_A3, NOTE_REST, NOTE_A4, NOTE_A5,  TONES_REPEAT};
 //	uint16_t durs[]={1000, 250, 500, 2000,  TONES_REPEAT};
-
+	uint16_t freqs1[]={800,50,700,30,300,10,TONES_END};
+//		uint16_t freqs2[]={700,900,1500,TONES_END};
+//	uint16_t durs2[]={10,30,50,0};
+			uint16_t freqs2[]={NOTE_C6,68 ,NOTE_D6,68,NOTE_E6,68,NOTE_F6,68,NOTE_G6,68,NOTE_A6,68,NOTE_B6,68,NOTE_C7,68,TONES_END};
+	
   while (1)
   {
 		keypadRead();
@@ -218,11 +222,12 @@ int main(void)
 
 		if(isKeyPress(KeySS) && state==UpState)  //goto stop
 		{
-			play_tone(freqs,durs,3);
+//			play_tone(freqs1);
+			play_tone_reverse(freqs2);
 		}
 		if(isKeyPress(KeyPower))
 		{
-			mute_tone();
+			play_tone(freqs2);
 		}
 #if 0				
 		 if(isKeyPress(KeySS)&& state==RunState)

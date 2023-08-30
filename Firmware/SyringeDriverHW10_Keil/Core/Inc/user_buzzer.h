@@ -18,6 +18,7 @@
 #define TONES_END 		65535
 #define TONES_REPEAT 	65534
 
-void play_tone(uint16_t *freq,uint16_t *dur,uint16_t length);
+void play_tone(uint16_t *tones);
+void play_tone_reverse(uint16_t *tones);
 void mute_tone(void);
 #endif
