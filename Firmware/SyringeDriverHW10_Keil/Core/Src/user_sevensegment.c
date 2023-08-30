@@ -1,7 +1,9 @@
-#include "sevensegment.h"
+#include "user_sevensegment.h"
 #include <ctype.h>
 	__IO uint8_t seg_value=0;
-void show_seg(char ch)
+	__IO uint8_t current_dp[2]={0,0};
+
+void showSeg(char ch,uint8_t dp)
 {
 	switch(ch)
 	{
@@ -48,6 +50,7 @@ void show_seg(char ch)
 			seg_value=127;			
 		break;
 	}
+	seg_value|=dp;
 	//Common anode 
 #if defined(CA_SEG)
 	if(seg_value &0x80)
@@ -170,35 +173,32 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		}
 		if(!blink_active || !blink_state)
 		{
+				showSeg(current_ch[index_digit],current_dp[index_digit]);		
 			if(index_digit)
 			{
 				HAL_GPIO_WritePin(SegNum1_GPIO_Port,SegNum1_Pin,GPIO_PIN_SET);
 				HAL_GPIO_WritePin(SegNum2_GPIO_Port,SegNum2_Pin,GPIO_PIN_RESET);
-				show_seg(current_ch[index_digit]);		
-				
 				index_digit=0;
 			}
 			else
 			{
 				HAL_GPIO_WritePin(SegNum2_GPIO_Port,SegNum2_Pin,GPIO_PIN_SET);
 				HAL_GPIO_WritePin(SegNum1_GPIO_Port,SegNum1_Pin,GPIO_PIN_RESET);
-				show_seg(current_ch[index_digit]);		
-				
 				index_digit=1;			
 			}
 		}
 	}
 }
 /*-----------------------------------------------------------------*/
-void init_segs(void)
+void initSegs(void)
 {	
-	clear_segs();
+	clearSegs();
 	HAL_TIM_Base_Start_IT(&SEGMENT_TIMER);
 	
 	
 }
 /*-----------------------------------------------------------------*/
-void print_segs(char *str,uint8_t blink)
+void printSegs(char *str,uint8_t blink)
 {
 	index_digit=0;
 	blink_active=blink;
@@ -206,9 +206,17 @@ void print_segs(char *str,uint8_t blink)
 	blink_cnt=0;
 	current_ch[0]=str[0];
 	current_ch[1]=str[1];
+	current_dp[0]=0;
+	current_dp[1]=0;
 }
 /*-----------------------------------------------------------------*/
-void blink_segs(uint8_t blink)
+void printDPSegs(char *str)
+{
+	current_dp[0]=(str[0]==' ')?0:0x80;
+	current_dp[1]=(str[1]==' ')?0:0x80;	
+}
+/*-----------------------------------------------------------------*/
+void blinkSegs(uint8_t blink)
 {
 	index_digit=0;
 	blink_active=blink;
@@ -217,14 +225,16 @@ void blink_segs(uint8_t blink)
 	
 }
 /*-----------------------------------------------------------------*/
-void clear_segs()
+void clearSegs()
 {
 	index_digit=0;
 	blink_active=0;
 	blink_state=0;
 	blink_cnt=0;
 	current_ch[0]=' ';
-	current_ch[0]=' ';
+	current_ch[1]=' ';
+	current_dp[0]=0;	
+	current_dp[1]=0;	
 	HAL_GPIO_WritePin(SegNum2_GPIO_Port,SegNum2_Pin,GPIO_PIN_SET);
 	HAL_GPIO_WritePin(SegNum1_GPIO_Port,SegNum1_Pin,GPIO_PIN_SET);	
 }

@@ -108,6 +108,8 @@ void Error_Handler(void);
 #define KeyType_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
+typedef enum {NoneState=0,WakeupState,NormalState,UpState,RunState,StandbyState,SetupState} mState_t;
+extern mState_t machineState;
 
 /* USER CODE END Private defines */
 

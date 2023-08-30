@@ -396,31 +396,6 @@
           <GroupName>Application/User/Core</GroupName>
           <Files>
             <File>
-              <FileName>keypad.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\keypad.c</FilePath>
-            </File>
-            <File>
-              <FileName>user_punc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\user_punc.c</FilePath>
-            </File>
-            <File>
-              <FileName>user_buzzer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\user_buzzer.c</FilePath>
-            </File>
-            <File>
-              <FileName>stdout_user.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\stdout_user.c</FilePath>
-            </File>
-            <File>
-              <FileName>Tones_Pitches.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Core\Inc\Tones_Pitches.h</FilePath>
-            </File>
-            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/main.c</FilePath>
@@ -568,11 +543,6 @@
               <FilePath>../Core/Src/stm32f1xx_hal_msp.c</FilePath>
             </File>
             <File>
-              <FileName>sevensegment.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Inc\sevensegment.c</FilePath>
-            </File>
-            <File>
               <FileName>eeprom.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\eeprom.c</FilePath>
@@ -581,6 +551,41 @@
               <FileName>user_eeprom.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\user_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>user_buzzer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\user_buzzer.c</FilePath>
+            </File>
+            <File>
+              <FileName>user_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\user_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>user_stdout.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\user_stdout.c</FilePath>
+            </File>
+            <File>
+              <FileName>user_sevensegment.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\user_sevensegment.c</FilePath>
+            </File>
+            <File>
+              <FileName>user_keypad.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\user_keypad.c</FilePath>
+            </File>
+            <File>
+              <FileName>user_punc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\user_punc.c</FilePath>
+            </File>
+            <File>
+              <FileName>Tones_Pitches.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\Tones_Pitches.c</FilePath>
             </File>
           </Files>
         </Group>

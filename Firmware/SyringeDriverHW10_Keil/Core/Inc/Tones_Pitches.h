@@ -7,6 +7,7 @@
 
 #ifndef __TONES_PITCHES_H__
 #define __TONES_PITCHES_H__
+#include "stm32f1xx.h"
 
 #define NOTE_REST 0
 #define NOTE_C0  16
@@ -251,4 +252,8 @@
 #define NOTE_AS9H (NOTE_AS9 + TONE_HIGH_VOLUME)
 #define NOTE_B9H  (NOTE_B9 + TONE_HIGH_VOLUME)
 
+
+extern uint16_t tonePowerWake[];
+extern uint16_t toneKeyPress[];
+extern uint16_t toneBeep[];
 #endif

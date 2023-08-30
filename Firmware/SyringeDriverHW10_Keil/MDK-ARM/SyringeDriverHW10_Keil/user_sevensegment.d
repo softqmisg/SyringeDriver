@@ -1,5 +1,5 @@
-syringedriverhw10_keil/user_eeprom.o: ..\Core\Src\user_eeprom.c \
-  ..\Core\Inc\user_eeprom.h ..\Core\Inc\main.h \
+syringedriverhw10_keil/user_sevensegment.o: \
+  ..\Core\Src\user_sevensegment.c ..\Core\Inc\user_sevensegment.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h \
   ..\Core\Inc\stm32f1xx_hal_conf.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_rcc.h \
@@ -33,10 +33,11 @@ syringedriverhw10_keil/user_eeprom.o: ..\Core\Src\user_eeprom.c \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_tim.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_tim_ex.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_uart.h \
+  ..\Core\Inc\tim.h ..\Core\Inc\main.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_rcc.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_bus.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_system.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_utils.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_cortex.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_pwr.h \
-  ..\Core\Inc\eeprom.h
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\ctype.h

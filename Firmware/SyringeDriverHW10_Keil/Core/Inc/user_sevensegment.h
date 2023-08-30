@@ -11,9 +11,11 @@
 
 #define BLINKON_DELAY				1000	//ms
 #define BLINKOFF_DELAY				500	//ms
-void init_segs(void);
-void print_segs(char *str,uint8_t blink);
-void blink_segs(uint8_t blink);
-void clear_segs();
+
+void initSegs(void);
+void printSegs(char *str,uint8_t blink);
+void printDPSegs(char *str);
+void blinkSegs(uint8_t blink);
+void clearSegs();
 
 #endif

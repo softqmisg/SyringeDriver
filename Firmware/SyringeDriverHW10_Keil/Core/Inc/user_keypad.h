@@ -30,6 +30,8 @@
 #define _H_KEYPAD_H
 
 #include "main.h"
+#define mPinRead(port , pin)	HAL_GPIO_ReadPin(port,pin)
+
 //-- Settings.
 #define KEY_DEBOUNCE_TIME								5UL
 #define KEY_LONGPRESS_TIME							1000UL

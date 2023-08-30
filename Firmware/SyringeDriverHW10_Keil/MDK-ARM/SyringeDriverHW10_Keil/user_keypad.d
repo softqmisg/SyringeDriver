@@ -1,5 +1,6 @@
-syringedriverhw10_keil/user_eeprom.o: ..\Core\Src\user_eeprom.c \
-  ..\Core\Inc\user_eeprom.h ..\Core\Inc\main.h \
+syringedriverhw10_keil/user_keypad.o: ..\Core\Src\user_keypad.c \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h \
+  ..\Core\Inc\user_keypad.h ..\Core\Inc\main.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h \
   ..\Core\Inc\stm32f1xx_hal_conf.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_rcc.h \
@@ -39,4 +40,5 @@ syringedriverhw10_keil/user_eeprom.o: ..\Core\Src\user_eeprom.c \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_utils.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_cortex.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_pwr.h \
-  ..\Core\Inc\eeprom.h
+  ..\Core\Inc\user_punc.h ..\Core\Inc\user_buzzer.h ..\Core\Inc\tim.h \
+  ..\Core\Inc\Tones_Pitches.h

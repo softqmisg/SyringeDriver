@@ -5,8 +5,9 @@
  uint16_t EEValue_CURMOT;
  uint16_t EEValue_VOLBAT;
  uint16_t EEValue_CURBAT;
+ mState_t EEValue_MSTATE;
 /////////////////////////////////////////////////////////////////////
-void eeprom_read_values(void)
+void eepromReadValues(void)
 {
 	uint16_t tmp_read;
 	EE_ReadVariable(EE_ADD_PWM,&tmp_read);//(bytes_value[0]|(bytes_value[1]<<8));
@@ -26,9 +27,12 @@ void eeprom_read_values(void)
 
 	EE_ReadVariable(EE_ADD_CURBAT,&tmp_read);//(bytes_value[0]|(bytes_value[1]<<8));
 	EEValue_CURBAT=tmp_read;		
+
+	EE_ReadVariable(EE_ADD_MSTATE ,&tmp_read);//(bytes_value[0]|(bytes_value[1]<<8));
+	EEValue_MSTATE=(mState_t)tmp_read;
 }
 /////////////////////////////////////////////////
-void eeprom_write_defaults(void)
+void eepromWriteDefaults(void)
 {
 	EE_WriteVariable(EE_ADD_PWM,(uint16_t)DEFAULT_PWM);HAL_Delay(50);
 	EE_WriteVariable(EE_ADD_VHALLF,(uint16_t)DEFAULT_VHALLF);HAL_Delay(50);
@@ -36,6 +40,7 @@ void eeprom_write_defaults(void)
 	EE_WriteVariable(EE_ADD_CURMOT,(uint16_t)DEFAULT_CURMOT);HAL_Delay(50);
 	EE_WriteVariable(EE_ADD_VOLBAT,(uint16_t)DEFAULT_VOLBAT);HAL_Delay(50);
 	EE_WriteVariable(EE_ADD_CURBAT,(uint16_t)DEFAULT_CURBT);HAL_Delay(50);
+	EE_WriteVariable(EE_ADD_MSTATE,(uint16_t)DEFAULT_MSTATE);HAL_Delay(50);
 
 	
 }

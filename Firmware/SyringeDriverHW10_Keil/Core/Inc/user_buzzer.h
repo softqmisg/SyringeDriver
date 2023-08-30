@@ -4,6 +4,7 @@
 #include "stm32f1xx_hal.h"
 #include "tim.h"
 
+
 #define BUZZERPERIOD_TIMER		htim3
 #define BUZZERPERIOD_INSTANCE	TIM3
 #define BUZZERPERIOD_CHANNEL			TIM_CHANNEL_1
@@ -18,7 +19,7 @@
 #define TONES_END 		65535
 #define TONES_REPEAT 	65534
 
-void play_tone(uint16_t *tones);
-void play_tone_reverse(uint16_t *tones);
-void mute_tone(void);
+void playTone(uint16_t *tones);
+void playToneReverse(uint16_t *tones);
+void muteTone(void);
 #endif

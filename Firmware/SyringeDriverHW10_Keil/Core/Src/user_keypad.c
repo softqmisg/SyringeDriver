@@ -27,12 +27,12 @@
  */
 
 
-
-#include <keypad.h>
-#include <user_punc.h>
 #include <string.h>
 
-#define mPinRead(port , pin)	HAL_GPIO_ReadPin(port,pin)
+#include "user_keypad.h"
+#include "user_punc.h"
+#include "user_buzzer.h"
+#include "Tones_Pitches.h"
 
 // Struct to keep the variables of the keypad module.
 typedef struct {
@@ -164,11 +164,13 @@ uint8_t isKeyDown(uint16_t m) {
 }
 
 uint8_t isKeyPress(uint16_t m) {
-	return ((keypad.keysReleased == (m)));
+	uint8_t r=((keypad.keysReleased == (m)));
+	return r;
 }
 
 uint8_t isKeyHold(uint16_t m) {
-	return ((keypad.keysReleased == (m | KEYLONG)));
+	uint8_t r=((keypad.keysReleased == (m | KEYLONG)));
+	return r;
 }
 
 tKeyState KeyState(uint16_t m)
