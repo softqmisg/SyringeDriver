@@ -32,6 +32,7 @@
 #include "user_buzzer.h"
 #include "Tones_Pitches.h"
 #include "sevensegment.h"
+#include "user_eeprom.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -230,15 +231,17 @@ int main(void)
 	uint16_t freqs2[]={NOTE_C6,68 ,NOTE_D6,68,NOTE_E6,68,NOTE_F6,68,NOTE_G6,68,NOTE_A6,68,NOTE_B6,68,NOTE_C7,68,TONES_REPEAT};
 	char msg[3];
 	play_tone(freqs2);
-	for(uint8_t i=0;i<100;i++)
+	for(uint8_t i=0;i<5;i++)
 	{
 		sprintf(msg,"%2d",i);
-		print_segs(msg,0);HAL_Delay(500);
+		print_segs(msg,0);HAL_Delay(300);
 	}
 print_segs("cc",0);HAL_Delay(800);
 print_segs("CC",0);;
 mute_tone();
-	
+	HAL_FLASH_Unlock();
+	EE_Init();
+
   while (1)
   {
 		keypadRead();
@@ -252,17 +255,26 @@ mute_tone();
 			play_tone_reverse(freqs2);
 			blink_segs(0);
 			print_segs("22",0);
+			eeprom_read_values();
 		}
 		if(isKeyPress(KeyPower))
 		{
 			play_tone(freqs2);
 			blink_segs(0);
-			print_segs("33",0);
+			eeprom_write_defaults();
 		}
 		if(isKeyPress(KeyTime))
 		{
 			mute_tone();
-			print_segs("44",0);			
+			sprintf(msg,"%2d",EEValue_VHALLF/10);
+			print_segs(msg,1);
+		}
+		if(isKeyPress(KeyType))
+		{
+			EEValue_VHALLF+=50;
+			EE_WriteVariable(EE_ADD_VHALLF,EEValue_VHALLF);
+			sprintf(msg,"%2d",EEValue_VHALLF/10);
+			print_segs(msg,0);
 		}
 #if 0				
 		 if(isKeyPress(KeySS)&& state==RunState)
