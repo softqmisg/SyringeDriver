@@ -37,6 +37,7 @@
 #include "user_syringe.h"
 #include "user_motor.h"
 #include "user_adc.h"
+#include "user_hall.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

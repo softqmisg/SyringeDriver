@@ -10,6 +10,5 @@
 void motorStop(void);
 uint8_t motorStart(double percent);
 uint8_t motorIsStart(void);
-void hallON(void);
-void hallOFF(void);
+
 #endif

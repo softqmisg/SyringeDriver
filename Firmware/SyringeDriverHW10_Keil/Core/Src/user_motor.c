@@ -29,11 +29,3 @@ uint8_t motorIsStart()
 {
 	return motorIsStartlocal;
 }
-void hallON()
-{
-		HAL_TIM_PWM_Start(&motorTIMER,motorCHANNEL1);
-}
-void hallOFF()
-{
-		HAL_TIM_PWM_Stop(&motorTIMER,motorCHANNEL1);
-}
