@@ -69,23 +69,19 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 mState_t machineState=NoneState;
+rState_t runState=RunNoneState;
+
 // ----------------------Systick callback-----------------------------------------
-#define LED_TOGGLE_DELAY  100 //2000*1ms=2s
-static __IO uint32_t TimingDelay=0;
+__IO uint16_t sysTick_cnt1s=0;
+__IO uint8_t sysTick_flag1s=0;
 void HAL_SYSTICK_Callback(void)
-{  
-//  if(state==UpState)
-//  {
-//    if(TimingDelay!=0)
-//    {
-//      TimingDelay--;
-//    }
-//    else
-//    {
-//      HAL_GPIO_TogglePin(LedBat_GPIO_Port,LedBat_Pin);
-//      TimingDelay = LED_TOGGLE_DELAY;    
-//    }
-//  }  
+{
+	sysTick_cnt1s++;
+	if(sysTick_cnt1s>=1000)
+	{
+		sysTick_cnt1s=0;
+		sysTick_flag1s=1;
+	}
 }
 /*----------------------------------------------------------------------*/
 __IO uint8_t rtc_flag=0;
@@ -111,7 +107,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 	cnvCompleted=1;
 }
 /*----------------------------------------------------------------------*/
-typedef enum {LedBat,LedAlarm,LedSS} Led_t;
 void setLED(Led_t led,uint8_t state)
 {
 	GPIO_TypeDef *port;
@@ -172,6 +167,8 @@ int main(void)
 	uint16_t tmp_uint16t=0;
 	uint8_t submenuIndex=0;
 	uint8_t typeSwitchcnt;
+	GPIO_PinState prevSwitchFB;
+	double motorDuty=0.0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -244,6 +241,7 @@ int main(void)
 				break;
 			//---------------------StandbyState------------------------------------//
 			case StandbyState:
+				clearSegs();				
 				gotoStandbyMode(0);
 				break;
 			//---------------------WakeupState------------------------------------//
@@ -256,7 +254,6 @@ int main(void)
 					eepromReadValues();
 					printf("change to UpState\r\n");
 					playTone(tonePowerWake);
-					
 					GoStandbyCnt=DELAY_GOSTANDBY;
 					typeSwitchcnt=1;
 					submenuIndex=0;
@@ -265,6 +262,7 @@ int main(void)
 				}
 				if(isKeyPress(KeyPower))
 				{
+					clearSegs();					
 					gotoStandbyMode(1);
 				}
 				break;
@@ -360,6 +358,8 @@ int main(void)
 				{
 					playTone(toneBeep);
 					machineState=RunState;
+					runState=RunOnState;
+					eepromReadValues();
 					playTone(toneStartRun);
 				}
 				if(isKeyHold(KeyPower))
@@ -374,6 +374,107 @@ int main(void)
 				break;
 			//---------------------RunState------------------------------------//
 			case RunState:
+				if(runState==RunOnState)
+				{
+					clearSegs();
+					if(hallIsEnd())
+					{
+						playTone(toneAlarmNE);
+						setLED(LedAlarm,1);
+						rtc_flag=0;
+						while(!rtc_flag);
+						setLED(LedAlarm,0);
+						systemError=ERR_NE;
+						printf("Error!Near End of path\r\n");
+					}
+					setLED(LedSS,1);
+					prevSwitchFB=mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin);
+					motorDuty=motorCalcDuty();
+					if(motorDuty>100.0)
+					{
+						motorDuty=100.0;
+						if(systemError!=ERR_NONE)
+							playTone(toneAlarmNE);
+						setLED(LedAlarm,1);
+						rtc_flag=0;
+						while(!rtc_flag);
+						setLED(LedAlarm,0);
+						systemError=ERR_DU;
+						printf("Error!Duty cycle more than %%100\r\n");
+					}
+					motorStart(motorDuty);
+					sysTick_cnt1s=0;
+					sysTick_flag1s=0;
+					while(!sysTick_flag1s && prevSwitchFB==mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin));
+					motorStop();
+					setLED(LedSS,0);
+					if(prevSwitchFB!=mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin))
+					{
+						motorErrNum=0;
+						runState=RunOffState;
+						gotoStopMode();
+						if(awu_flag)
+						{
+							awu_flag=0;
+							printf("AWU timeout!\r\n");
+							runState=RunOnState;
+						}
+					}
+					else
+					{
+						playTone(toneAlarm);
+						setLED(LedAlarm,1);
+						rtc_flag=0;
+						while(!rtc_flag);
+						setLED(LedAlarm,0);
+						systemError=ERR_E5;
+						motorErrNum++;
+						if(motorErrNum>=MAX_MotorErrNum)
+						{
+							setLED(LedAlarm,1);
+							printf("error!exceed maximum motor error.\r\n");
+							machineState=StandbyState;
+							
+						}
+						else
+						{
+							printf("error!timout but go to mode\r\n");
+							runState=RunOffState;
+							gotoStopMode();							
+						}
+					}
+				}
+				else
+				{
+					if(isKeyPress(KeyPower))
+					{
+						playTone(toneBeep);
+						if(systemError!=ERR_NONE)
+						{
+							printSegs(systemErrorMsg[systemError],0);
+						}
+						else
+						{
+							sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
+							printSegs(msg,0);
+						}
+						rtc_flag=0;
+						while(!rtc_flag);
+						clearSegs();
+						runState=RunOffState;
+						gotoStopMode();
+					}
+					if(isKeyHold(KeySS))
+					{
+						playTone(toneBeep);
+						machineState=UpState;
+						GoStandbyCnt=DELAY_GOSTANDBY;
+						typeSwitchcnt=1;
+						submenuIndex=0;
+						sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
+						printSegs(msg,0);
+					}
+				}
 				break;
 			//---------------------SetupState------------------------------------//
 			case SetupState:

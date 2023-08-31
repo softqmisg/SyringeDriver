@@ -111,8 +111,12 @@ void Error_Handler(void);
 #define DELAY_GOSTANDBY	130
 
 typedef enum {NoneState=0,WakeupState,NormalState,UpState,RunState,StandbyState,SetupState} mState_t;
-extern mState_t machineState;
+typedef enum {RunNoneState=0,RunOnState,RunOffState} rState_t;
+typedef enum {LedBat,LedAlarm,LedSS} Led_t;
 
+extern mState_t machineState;
+extern rState_t runState;
+void setLED(Led_t led,uint8_t state);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -6,5 +6,6 @@
 
 void hallON(void);
 void hallOFF(void);
+uint8_t hallIsEnd(void);
 
 #endif

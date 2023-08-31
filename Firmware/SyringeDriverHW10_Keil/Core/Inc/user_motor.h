@@ -6,9 +6,12 @@
 #define motorCHANNEL1	TIM_CHANNEL_1
 #define motorCHANNEL2	TIM_CHANNEL_2
 #define motorFreqPWM	5000 //Hz
+#define MAX_MotorErrNum		2
 
+extern __IO uint8_t motorErrNum;
 void motorStop(void);
-uint8_t motorStart(double percent);
+void motorStart(double percent);
 uint8_t motorIsStart(void);
+double motorCalcDuty(void);
 
 #endif
