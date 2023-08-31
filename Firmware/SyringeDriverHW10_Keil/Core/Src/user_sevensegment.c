@@ -45,6 +45,15 @@ void showSeg(char ch,uint8_t dp)
 			break;
 		case 'c':
 			seg_value=88;
+			break;
+		case 'H':
+			seg_value=0x76;
+			break;
+		case 'F':
+			seg_value=0x71;
+			break;
+		case 'E':
+			seg_value=0x79;
 			break;		
 		default:
 			seg_value=127;			

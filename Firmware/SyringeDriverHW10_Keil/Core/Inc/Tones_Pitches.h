@@ -259,4 +259,5 @@ extern uint16_t toneAlarm[];
 extern uint16_t toneBeep[];
 extern uint16_t toneSave[];
 extern uint16_t toneEnterSetup[];
+extern uint16_t toneStartRun[];
 #endif
