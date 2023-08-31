@@ -56,30 +56,30 @@ void HAL_GPIO_EXTI_Callback(uint16_t gpio_pin)
 void gotoStopMode(void)
 {
   __IO uint32_t index = 0;
-  GPIO_InitTypeDef  GPIO_InitStruct;
+  GPIO_InitTypeDef  sGpio;
 	
-  GPIO_InitStruct.Pin = KeySS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(KeySS_GPIO_Port, &GPIO_InitStruct);
+  sGpio.Pin = KeySS_Pin;
+  sGpio.Mode = GPIO_MODE_IT_FALLING;
+  sGpio.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(KeySS_GPIO_Port, &sGpio);
 	HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);//PORTC.13
 
-  GPIO_InitStruct.Pin = KeyPower_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed=GPIO_SPEED_FREQ_MEDIUM;
-  HAL_GPIO_Init(KeyPower_GPIO_Port, &GPIO_InitStruct);
+  sGpio.Pin = KeyPower_Pin;
+  sGpio.Mode = GPIO_MODE_IT_FALLING;
+  sGpio.Pull = GPIO_NOPULL;
+	sGpio.Speed=GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(KeyPower_GPIO_Port, &sGpio);
 	HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(EXTI1_IRQn);//PORTA.1
 	
 
-  RTC_AlarmTypeDef  RTC_AlarmStruct;
-  RTC_AlarmStruct.AlarmTime.Hours=0x00;
-	RTC_AlarmStruct.AlarmTime.Minutes=0x00;
-	RTC_AlarmStruct.AlarmTime.Seconds=20;
-	RTC_AlarmStruct.Alarm=RTC_ALARM_A;
-//  HAL_RTC_SetAlarm_IT(&hrtc, &RTC_AlarmStruct,RTC_FORMAT_BIN);
+  RTC_AlarmTypeDef  sAlarm;
+  sAlarm.AlarmTime.Hours=0x00;
+	sAlarm.AlarmTime.Minutes=0x00;
+	sAlarm.AlarmTime.Seconds=20;
+	sAlarm.Alarm=RTC_ALARM_A;
+//  HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm,RTC_FORMAT_BIN);
 
 	HAL_GPIO_WritePin(LedBat_GPIO_Port,LedBat_Pin,GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(LedAlarm_GPIO_Port,LedAlarm_Pin,GPIO_PIN_RESET);

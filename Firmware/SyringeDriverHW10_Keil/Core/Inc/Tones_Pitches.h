@@ -255,5 +255,8 @@
 
 extern uint16_t tonePowerWake[];
 extern uint16_t toneKeyPress[];
+extern uint16_t toneAlarm[];
 extern uint16_t toneBeep[];
+extern uint16_t toneSave[];
+extern uint16_t toneEnterSetup[];
 #endif

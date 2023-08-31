@@ -35,6 +35,8 @@
 #include "user_eeprom.h"
 #include "user_pwr.h"
 #include "user_syringe.h"
+#include "user_motor.h"
+#include "user_adc.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -85,12 +87,19 @@ void HAL_SYSTICK_Callback(void)
 //  }  
 }
 /*----------------------------------------------------------------------*/
-
 __IO uint8_t rtc_flag=0;
+__IO uint8_t rtc_flag2s=0;
+__IO uint8_t rtc_cnt2s=0;
 __IO uint8_t GoStandbyCnt=0;
 void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 {
-		rtc_flag=1;
+	rtc_flag=1;
+	rtc_cnt2s++;
+	if(rtc_cnt2s>1)
+	{
+		rtc_cnt2s=0;
+		rtc_flag2s=1;
+	}
 	if(GoStandbyCnt)
 		GoStandbyCnt--;	
 }
@@ -161,7 +170,6 @@ int main(void)
 	uint8_t menu_index=0;
 	uint16_t tmp_uint16t=0;
 	uint8_t submenuIndex=0;
-	uint16_t adcRawValue[4];
 	uint8_t typeSwitchcnt;
   /* USER CODE END 1 */
 
@@ -264,6 +272,7 @@ int main(void)
 				eepromReadValues();
 				if(mPinRead(KeyType_GPIO_Port,KeyType_Pin)==GPIO_PIN_RESET && mPinRead(KeyTime_GPIO_Port,KeyTime_Pin)==GPIO_PIN_RESET )
 				{
+					playTone(toneEnterSetup);
 					printf("enter Setup\r\n");
 					machineState=SetupState;
 					submenuIndex=0;
@@ -273,6 +282,7 @@ int main(void)
 				}
 				else if(mPinRead(KeyType_GPIO_Port,KeyType_Pin)==GPIO_PIN_RESET && mPinRead(KeySS_GPIO_Port,KeySS_Pin)==GPIO_PIN_RESET )
 				{
+					playTone(toneSave);
 					setLED(LedAlarm,1);
 					printf("write defaults\r\n");
 					eepromWriteDefaults();
@@ -307,6 +317,7 @@ int main(void)
 			case UpState:
 				if(isKeyPress(KeyTime))
 				{
+					playTone(toneBeep);
 					typeSwitchcnt=1;
 					submenuIndex=0;
 					EEValue_TIMEINDEX++;
@@ -319,16 +330,17 @@ int main(void)
 				}
 				if(isKeyPress(KeyType))
 				{
+					playTone(toneBeep);
 					typeSwitchcnt=1;
 					submenuIndex=1;
 					EEValue_TYPEINDEX++;
 					if(EEValue_TYPEINDEX>=MAX_TYPEINDEX)
 						EEValue_TYPEINDEX=0;
-					EE_WriteVariable(EE_ADD_TYPEINDEX,EEValue_TYPEINDEX);					
+					EE_WriteVariable(EE_ADD_TYPEINDEX,EEValue_TYPEINDEX);
 					sprintf(msg,"%02d",syringeTypes[EEValue_TYPEINDEX]);
 					printSegs(msg,0);
 					rtc_flag=0;
-					GoStandbyCnt=DELAY_GOSTANDBY;					
+					GoStandbyCnt=DELAY_GOSTANDBY;
 				}
 				if(submenuIndex==1)
 				{
@@ -343,12 +355,13 @@ int main(void)
 						{
 							sprintf(msg,"cc");
 						}
-						printSegs(msg,0);								
+						printSegs(msg,0);
 						typeSwitchcnt=1-typeSwitchcnt;
 					}
 				}
 				if(isKeyHold(KeySS))
 				{
+					playTone(toneBeep);
 					machineState=RunState;
 					EE_WriteVariable(EE_ADD_MSTATE,(uint16_t)machineState);
 				}
@@ -371,38 +384,84 @@ int main(void)
 				{
 					//---------------------0:PWM setting-------------------------------//
 					case 0:
-					if(isKeyPress(KeyTime))
-					{
-						playTone(toneBeep);
-						tmp_uint16t++;
-						if(tmp_uint16t>MAX_PWM)
-							tmp_uint16t=MIN_PWM;
-						sprintf(msg,"%02d",tmp_uint16t);
-						printSegs(msg,1);
-					}
-					if(isKeyPress(KeyType))
-					{
-						playTone(toneBeep);
-						if(tmp_uint16t==MIN_PWM)
-							tmp_uint16t=MAX_PWM+1;
-						tmp_uint16t--;
-						sprintf(msg,"%02d",tmp_uint16t);
-						printSegs(msg,1);					
-					}
-					if(isKeyPress(KeySS))
-					{
-						playTone(toneBeep);
-						sprintf(msg,"%02d",tmp_uint16t);
-						printSegs(msg,0);					
-						printDPSegs(" .");
-						EE_WriteVariable(EE_ADD_PWM,(uint16_t)tmp_uint16t);
-						eepromReadValues();					
-					}
-					if(isKeyHold(KeyPower))
-					{
-						playTone(toneBeep);
-						machineState=StandbyState;
-					}
+						
+						if(rtc_flag2s && motorIsStart())
+						{
+							rtc_flag2s=0;
+							printf("BatCur:%.2f (mA)\r\n",(double)adcGetValue(adcBATCUR));
+							printf("MotCur:%.2f(mA)\r\n",(double)adcGetValue(adcMOTCUR));
+							printf("HallVolt:%.1f (mv)\r\n",(double)adcGetValue(adcHALVOLT));
+							printf("BatVolt:%.1f (mv)\r\n",(double)adcGetValue(adcBATVOLT));
+							printf("=====================================================\r\n");
+						}			
+						if(isKeyHold(KeyTime)&& !motorIsStart())
+						{
+							playTone(toneBeep);
+							tmp_uint16t+=10;
+							if(tmp_uint16t>MAX_PWM)
+								tmp_uint16t=MIN_PWM;
+							sprintf(msg,"%02d",tmp_uint16t);
+							printSegs(msg,1);
+						}						
+						if(isKeyPress(KeyTime)&& !motorIsStart())
+						{
+							playTone(toneBeep);
+							tmp_uint16t++;
+							if(tmp_uint16t>MAX_PWM)
+								tmp_uint16t=MIN_PWM;
+							sprintf(msg,"%02d",tmp_uint16t);
+							printSegs(msg,1);
+						}
+						if(isKeyHold(KeyType)&& !motorIsStart())
+						{
+							playTone(toneBeep);
+							if(tmp_uint16t<MIN_PWM+10)
+								tmp_uint16t=MAX_PWM+10;
+							tmp_uint16t-=10;
+							sprintf(msg,"%02d",tmp_uint16t);
+							printSegs(msg,1);
+						}						
+						if(isKeyPress(KeyType)&& !motorIsStart())
+						{
+							playTone(toneBeep);
+							if(tmp_uint16t==MIN_PWM)
+								tmp_uint16t=MAX_PWM+1;
+							tmp_uint16t--;
+							sprintf(msg,"%02d",tmp_uint16t);
+							printSegs(msg,1);
+						}
+						if(isKeyHold(KeySS)&& motorIsStart())
+						{
+							playTone(toneBeep);
+							playTone(toneSave);
+							EE_WriteVariable(EE_ADD_PWM,(uint16_t)tmp_uint16t);
+							eepromReadValues();
+							EE_WriteVariable(EE_ADD_VOLBAT,(uint16_t)adcGetRaw(adcBATVOLT));
+							motorStop();
+							setLED(LedSS,0);
+						}
+						if(isKeyPress(KeySS))
+						{
+							playTone(toneBeep);
+							sprintf(msg,"%02d",tmp_uint16t);
+							printSegs(msg,0);
+							printDPSegs(" .");
+							if(motorIsStart()) //motor ON->OFF
+							{
+								motorStop();
+								setLED(LedSS,0);
+							}
+							else //motor OFF->ON
+							{
+								motorStart((double)tmp_uint16t);
+								setLED(LedSS,1);							
+							}
+						}
+						if(isKeyHold(KeyPower))
+						{
+							playTone(toneBeep);
+							machineState=StandbyState;
+						}
 					break;
 					//---------------------1:VOLTHALLF setting-------------------------------//
 					case 1:
