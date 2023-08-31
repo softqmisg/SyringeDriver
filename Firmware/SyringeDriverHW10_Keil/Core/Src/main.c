@@ -104,13 +104,20 @@ void HAL_SYSTICK_Callback(void)
 	}	
 }
 //-----------------------------------------------------
+void HAL_RTCEx_RTCEventErrorCallback(RTC_HandleTypeDef *hrtc)
+{
+		SYSCLKConfig_FromSTOP();
+	HAL_GPIO_TogglePin(LedBat_GPIO_Port,LedBat_Pin);
+}
+//-----------------------------------------------------
 static __IO uint8_t awu_wakup_cnt=0;
 __IO uint8_t awu_wakup=0;
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	RTC_TimeTypeDef sTime = {0};
 	SYSCLKConfig_FromSTOP();
-	//HAL_ResumeTick();
+	HAL_ResumeTick();
+	HAL_GPIO_TogglePin(LedAlarm_GPIO_Port,LedAlarm_Pin);
 	awu_wakup_cnt++;
 	if(awu_wakup_cnt>7) awu_wakup_cnt=0;
 		awu_wakup=1;
@@ -122,7 +129,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t gpio_pin)
 	if(gpio_pin==KeySS_Pin || gpio_pin ==KeyPower_Pin)
 	{
 		SYSCLKConfig_FromSTOP();
-		//HAL_ResumeTick();
+		HAL_ResumeTick();
 		HAL_GPIO_WritePin(LedAlarm_GPIO_Port,LedAlarm_Pin,GPIO_PIN_SET);
 		HAL_PWR_DisableSleepOnExit();
 	}
@@ -130,6 +137,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t gpio_pin)
 // ---------------------------------------------------------------
 void gotoStopMode(void)
 {
+	state=RunState;
   __IO uint32_t index = 0;
   GPIO_InitTypeDef  GPIO_InitStruct;
 	
@@ -148,13 +156,18 @@ void gotoStopMode(void)
 	HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(EXTI1_IRQn);//PORTA.1
 	
-
+	RTC_TimeTypeDef sTime = {0};
+	if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+	{
+		Error_Handler();
+	}
   RTC_AlarmTypeDef  RTC_AlarmStruct;
   RTC_AlarmStruct.AlarmTime.Hours=0x00;
 	RTC_AlarmStruct.AlarmTime.Minutes=0x00;
 	RTC_AlarmStruct.AlarmTime.Seconds=10;
 	RTC_AlarmStruct.Alarm=RTC_ALARM_A;
   HAL_RTC_SetAlarm_IT(&hrtc, &RTC_AlarmStruct,RTC_FORMAT_BIN);
+	
 
 	HAL_GPIO_WritePin(LedBat_GPIO_Port,LedBat_Pin,GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(LedAlarm_GPIO_Port,LedAlarm_Pin,GPIO_PIN_RESET);
@@ -168,13 +181,15 @@ void gotoStopMode(void)
 	keypadRead();
 //after stop clock source is 32768 for 2S interrupt,reload value is 2*32768=65536=	0x10000
 //	HAL_SYSTICK_Config(6553); 
-	//HAL_SuspendTick();
 //	HAL_PWR_EnableSleepOnExit();
-	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON,PWR_STOPENTRY_WFI);
+printf("Bye!goto stop\r\n");
+HAL_Delay(1000);
+	HAL_SuspendTick();
+HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON,PWR_STOPENTRY_WFI);
+printf("Hi!Wakeup\r\n");
 	HAL_RTC_DeactivateAlarm(&hrtc,RTC_ALARM_A);
-//	HAL_SYSTICK_Config(SystemCoreClock / (1000U / uwTickFreq)); //1Khz
-//	__HAL_CORTEX_SYSTICKCLK_CONFIG(SYSTICK_CLKSOURCE_HCLK);
-
+	__HAL_RTC_ALARM_DISABLE_IT(&hrtc,RTC_IT_SEC);
+state=UpState;
 }
 // ---------------------------------------------------------------
 void gotoStandByMode(void)
@@ -249,13 +264,18 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 		 GPIO_PinState SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);
-	
   while (1)
   {
 		keypadRead();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+		if(isKeyHold(KeyPower))
+		{
+			__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
+			gotoStopMode();
+		}
+#if 0		
 		if(isKeyHold(KeyPower))
 		{
 			if(wakeupstate)
@@ -268,6 +288,7 @@ int main(void)
 				gotoStandByMode();
 			}
 		}
+#endif
 #if 0
 		if(awu_wakup)
 		{
