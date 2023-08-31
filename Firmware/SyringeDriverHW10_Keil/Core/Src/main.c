@@ -202,342 +202,48 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	initSegs();
 	HAL_FLASH_Unlock();
-	EE_Init();   
-  if (__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
-  {
-    /* Clear Standby flag */
-    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU|PWR_FLAG_SB);
-			printf("hello!WakeupState\r\n");
-			machineState=WakeupState;
-  }	
-	else
-	{
-		printf("hello!NormalState\r\n");
-		machineState=NormalState;
-		uint16_t firstTimeCheck;
-		EE_ReadVariable(EE_ADD_FIRSTTIME,&firstTimeCheck);
-		if(firstTimeCheck!=0xA5)
-		{
-			printf("write default value\r\n");
-			EE_WriteVariable(EE_ADD_FIRSTTIME,0xA5);
-			eepromWriteDefaults();
-		}
-	}
 	__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
-	HAL_ADCEx_Calibration_Start(&hadc1);
-	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcRawValue,4);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	
+	uint16_t *tones[]={tonePowerWake,toneKeyPress,toneBeep,toneAlarm,toneSave,toneEnterSetup,toneStartRun};
+	uint8_t tonenum=0;
+sprintf(msg,"%02d",tonenum+1);
+printSegs(msg,0);	
 	while (1)
 	{
 		keypadRead();
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
-		switch(machineState)
+		if(isKeyHold(KeySS))
 		{
-			//---------------------NoneState------------------------------------//
-			case NoneState:
-				break;
-			//---------------------StandbyState------------------------------------//
-			case StandbyState:
-				gotoStandbyMode(0);
-				break;
-			//---------------------WakeupState------------------------------------//
-			case WakeupState:
-				if(isKeyHold(KeyPower))
-				{
-					playTone(toneBeep);
-					machineState=UpState;
-					EE_WriteVariable(EE_ADD_MSTATE,(uint16_t)machineState);
-					eepromReadValues();
-					printf("change to UpState\r\n");
-					playTone(tonePowerWake);
-					
-					GoStandbyCnt=DELAY_GOSTANDBY;
-					typeSwitchcnt=1;
-					submenuIndex=0;
-					sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
-					printSegs(msg,0);					
-				}
-				if(isKeyPress(KeyPower))
-				{
-					gotoStandbyMode(1);
-				}
-				break;
-			//---------------------NormalState------------------------------------//
-			case NormalState:
-				eepromReadValues();
-				if(mPinRead(KeyType_GPIO_Port,KeyType_Pin)==GPIO_PIN_RESET && mPinRead(KeyTime_GPIO_Port,KeyTime_Pin)==GPIO_PIN_RESET )
-				{
-					playTone(toneEnterSetup);
-					printf("enter Setup\r\n");
-					machineState=SetupState;
-					submenuIndex=0;
-					tmp_uint16t=EEValue_PWM;
-					sprintf(msg,"%02d",tmp_uint16t);
-					printSegs(msg,1);
-				}
-				else if(mPinRead(KeyType_GPIO_Port,KeyType_Pin)==GPIO_PIN_RESET && mPinRead(KeySS_GPIO_Port,KeySS_Pin)==GPIO_PIN_RESET )
-				{
-					playTone(toneSave);
-					setLED(LedAlarm,1);
-					printf("write defaults\r\n");
-					eepromWriteDefaults();
-					setLED(LedAlarm,0);
-					machineState=StandbyState;
-				}
-				else
-				{
-					machineState=EEValue_MSTATE;
-					if(machineState==UpState)
-					{
-						checkingSystem();
-						printf("goto Upstate\r\n");
-						
-						GoStandbyCnt=DELAY_GOSTANDBY;
-						typeSwitchcnt=1;
-						submenuIndex=0;
-						sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
-						printSegs(msg,0);								
-					}
-					else if(machineState==StandbyState)
-					{
-						printf("goto StandbyState\r\n");
-					}
-					else if(machineState==RunState)
-					{
-						printf("goto RunState\r\n");
-					}
-				}
-				break;
-			//---------------------UpState------------------------------------//
-			case UpState:
-				if(isKeyPress(KeyTime))
-				{
-					playTone(toneBeep);
-					typeSwitchcnt=1;
-					submenuIndex=0;
-					EEValue_TIMEINDEX++;
-					if(EEValue_TIMEINDEX>=MAX_TIMEINDEX)
-						EEValue_TIMEINDEX=0;
-					EE_WriteVariable(EE_ADD_TIMEINDEX,EEValue_TIMEINDEX);
-					sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
-					printSegs(msg,0);
-					GoStandbyCnt=DELAY_GOSTANDBY;
-				}
-				if(isKeyPress(KeyType))
-				{
-					playTone(toneBeep);
-					typeSwitchcnt=1;
-					submenuIndex=1;
-					EEValue_TYPEINDEX++;
-					if(EEValue_TYPEINDEX>=MAX_TYPEINDEX)
-						EEValue_TYPEINDEX=0;
-					EE_WriteVariable(EE_ADD_TYPEINDEX,EEValue_TYPEINDEX);
-					sprintf(msg,"%02d",syringeTypes[EEValue_TYPEINDEX]);
-					printSegs(msg,0);
-					rtc_flag=0;
-					GoStandbyCnt=DELAY_GOSTANDBY;
-				}
-				if(submenuIndex==1)
-				{
-					if(rtc_flag)
-					{
-						rtc_flag=0;
-						if(typeSwitchcnt)
-						{
-							sprintf(msg,"%02d",syringeTypes[EEValue_TYPEINDEX]);
-						}
-						else
-						{
-							sprintf(msg,"cc");
-						}
-						printSegs(msg,0);
-						typeSwitchcnt=1-typeSwitchcnt;
-					}
-				}
-				if(isKeyHold(KeySS))
-				{
-					playTone(toneBeep);
-					machineState=RunState;
-					EE_WriteVariable(EE_ADD_MSTATE,(uint16_t)machineState);
-				}
-				if(isKeyHold(KeyPower))
-				{
-					playTone(toneBeep);
-					machineState=StandbyState;
-				}
-				if(GoStandbyCnt==0)
-				{
-					machineState=StandbyState;
-				}
-				break;
-			//---------------------RunState------------------------------------//
-			case RunState:
-				break;
-			//---------------------SetupState------------------------------------//
-			case SetupState:
-				switch(submenuIndex)
-				{
-					//---------------------0:PWM setting-------------------------------//
-					case 0:
-						
-						if(rtc_flag2s && motorIsStart())
-						{
-							rtc_flag2s=0;
-							printf("BatCur:%.2f (mA)\r\n",(double)adcGetValue(adcBATCUR));
-							printf("MotCur:%.2f(mA)\r\n",(double)adcGetValue(adcMOTCUR));
-							printf("HallVolt:%.1f (mv)\r\n",(double)adcGetValue(adcHALVOLT));
-							printf("BatVolt:%.1f (mv)\r\n",(double)adcGetValue(adcBATVOLT));
-							printf("=====================================================\r\n");
-						}			
-						if(isKeyHold(KeyTime)&& !motorIsStart())
-						{
-							playTone(toneBeep);
-							tmp_uint16t+=10;
-							if(tmp_uint16t>MAX_PWM)
-								tmp_uint16t=MIN_PWM;
-							sprintf(msg,"%02d",tmp_uint16t);
-							printSegs(msg,1);
-						}						
-						if(isKeyPress(KeyTime)&& !motorIsStart())
-						{
-							playTone(toneBeep);
-							tmp_uint16t++;
-							if(tmp_uint16t>MAX_PWM)
-								tmp_uint16t=MIN_PWM;
-							sprintf(msg,"%02d",tmp_uint16t);
-							printSegs(msg,1);
-						}
-						if(isKeyHold(KeyType)&& !motorIsStart())
-						{
-							playTone(toneBeep);
-							if(tmp_uint16t<MIN_PWM+10)
-								tmp_uint16t=MAX_PWM+10;
-							tmp_uint16t-=10;
-							sprintf(msg,"%02d",tmp_uint16t);
-							printSegs(msg,1);
-						}						
-						if(isKeyPress(KeyType)&& !motorIsStart())
-						{
-							playTone(toneBeep);
-							if(tmp_uint16t==MIN_PWM)
-								tmp_uint16t=MAX_PWM+1;
-							tmp_uint16t--;
-							sprintf(msg,"%02d",tmp_uint16t);
-							printSegs(msg,1);
-						}
-						if(isKeyHold(KeySS)&& motorIsStart())
-						{
-							playTone(toneBeep);
-							playTone(toneSave);
-							EE_WriteVariable(EE_ADD_PWM,(uint16_t)tmp_uint16t);
-							eepromReadValues();
-							EE_WriteVariable(EE_ADD_VOLBAT,(uint16_t)adcGetRaw(adcBATVOLT));
-							motorStop();
-							setLED(LedSS,0);
-						}
-						if(isKeyPress(KeySS))
-						{
-							playTone(toneBeep);
-							sprintf(msg,"%02d",tmp_uint16t);
-							printSegs(msg,0);
-							printDPSegs(" .");
-							if(motorIsStart()) //motor ON->OFF
-							{
-								motorStop();
-								setLED(LedSS,0);
-							}
-							else //motor OFF->ON
-							{
-								motorStart((double)tmp_uint16t);
-								setLED(LedSS,1);							
-							}
-						}
-						if(isKeyHold(KeyPower))
-						{
-							playTone(toneBeep);
-							machineState=StandbyState;
-						}
-					break;
-					//---------------------1:VOLTHALLF setting-------------------------------//
-					case 1:
-						break;
-				}
-				break;
+			muteTone();
+		}if(isKeyPress(KeyPower))
+		{
+			playToneReverse(tones[tonenum]);
 		}
-
-#if 0        
-		 if(isKeyPress(KeySS)&& state==RunState)
+		if(isKeyPress(KeySS))
 		{
-			HAL_GPIO_WritePin(SegDP_GPIO_Port,SegDP_Pin,GPIO_PIN_RESET);  
-			HAL_GPIO_WritePin(SegNum1_GPIO_Port,SegNum1_Pin,GPIO_PIN_RESET);  
-			HAL_Delay(30);    
-			HAL_GPIO_WritePin(SegDP_GPIO_Port,SegDP_Pin,GPIO_PIN_SET);  
-			state=RunState;
-			gotoStopMode();      
-		}    
-		 if(isKeyHold(KeySS) && state==RunState)  //wake up pin & stop
-		{
-			HAL_GPIO_WritePin(SegB_GPIO_Port,SegB_Pin,GPIO_PIN_RESET);  
-			HAL_GPIO_WritePin(SegNum1_GPIO_Port,SegNum1_Pin,GPIO_PIN_RESET);  
-			state=UpState;
+			playTone(tones[tonenum]);
 		}
-		if(isKeyPress(KeyPower)&& state==RunState)//wake up pin
+		if(isKeyPress(KeyTime))
 		{
-			HAL_GPIO_WritePin(SegA_GPIO_Port,SegA_Pin,GPIO_PIN_RESET);  
-			HAL_GPIO_WritePin(SegNum1_GPIO_Port,SegNum1_Pin,GPIO_PIN_RESET);  
-			HAL_Delay(3000);
-			state=RunState;
-			gotoStopMode();
+			tonenum++;
+			if(tonenum>=TONESNUMBER)
+				tonenum=0;
+			sprintf(msg,"%02d",tonenum+1);
+			printSegs(msg,0);
 		}
-		 if(isKeyHold(KeyPower)&& state==RunState)
-		{
-			HAL_GPIO_WritePin(SegDP_GPIO_Port,SegDP_Pin,GPIO_PIN_RESET);  
-			HAL_GPIO_WritePin(SegNum2_GPIO_Port,SegNum2_Pin,GPIO_PIN_RESET);  
-			HAL_Delay(30);    
-			HAL_GPIO_WritePin(SegDP_GPIO_Port,SegDP_Pin,GPIO_PIN_SET);        
-			state=RunState;
-			gotoStopMode();      
-		}
-
-#endif
-#if 0
 		if(isKeyPress(KeyType))
 		{
-			HAL_GPIO_TogglePin(SegA_GPIO_Port,SegA_Pin);
-			HAL_GPIO_WritePin(SegNum1_GPIO_Port,SegNum1_Pin,GPIO_PIN_RESET);
+			if(tonenum==0)
+				tonenum=TONESNUMBER;
+			tonenum--;
+			sprintf(msg,"%02d",tonenum+1);
+			printSegs(msg,0);			
 		}
-		else if(isKeyHold(KeyType))
-		{
-			HAL_GPIO_TogglePin(SegNum1_GPIO_Port,SegNum1_Pin);
-		}
-		else if(isKeyPress(KeySS))
-		{
-//      HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
-//      __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,50-1);      
-//      HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
-//      HAL_GPIO_WritePin(LedSS_GPIO_Port,LedSS_Pin,GPIO_PIN_SET);
-			
-		}
-		else if(isKeyHold(KeySS))
-		{
-			HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
-			__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,50-1);      
-			HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
-			HAL_GPIO_WritePin(LedSS_GPIO_Port,LedSS_Pin,GPIO_PIN_SET);      
-		}    
-		if(SwitchFB_prvState!=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin))
-		{
-			HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_2);
-			HAL_TIM_PWM_Stop(&htim1,TIM_CHANNEL_1);
-			HAL_GPIO_WritePin(LedSS_GPIO_Port,LedSS_Pin,GPIO_PIN_RESET);    
-			SwitchFB_prvState=HAL_GPIO_ReadPin(SwitchFB_GPIO_Port,SwitchFB_Pin);    
-		}
-#endif
 	}
   /* USER CODE END 3 */
 }

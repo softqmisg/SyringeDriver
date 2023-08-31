@@ -252,7 +252,9 @@
 #define NOTE_AS9H (NOTE_AS9 + TONE_HIGH_VOLUME)
 #define NOTE_B9H  (NOTE_B9 + TONE_HIGH_VOLUME)
 
+#define TONESNUMBER 7
 
+extern uint16_t toneStartRun[];
 extern uint16_t tonePowerWake[];
 extern uint16_t toneKeyPress[];
 extern uint16_t toneAlarm[];
