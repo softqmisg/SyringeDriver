@@ -101,12 +101,6 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 		GoStandbyCnt--;	
 }
 /*----------------------------------------------------------------------*/
-__IO uint8_t cnvCompleted=0;
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-	cnvCompleted=1;
-}
-/*----------------------------------------------------------------------*/
 void setLED(Led_t led,uint8_t state)
 {
 	GPIO_TypeDef *port;
@@ -149,6 +143,7 @@ void checkingSystem(void)
 		printSegs(msg,0);
 		HAL_Delay(200);		
 	}
+	printSegs("  ",0);
 	printDPSegs("..");HAL_Delay(200);
 	clearSegs();	
 	playTone(tonePowerWake);
@@ -169,6 +164,8 @@ int main(void)
 	uint8_t typeSwitchcnt;
 	GPIO_PinState prevSwitchFB;
 	double motorDuty=0.0;
+	RTC_TimeTypeDef sTime={0};
+	RTC_DateTypeDef sDate={.Year=0x0,.Date=0x01,.Month=RTC_MONTH_JANUARY,.WeekDay=RTC_WEEKDAY_MONDAY};
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -224,6 +221,21 @@ int main(void)
 	__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
 	HAL_ADCEx_Calibration_Start(&hadc1);
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcRawValue,4);
+	
+//	eepromReadValues();
+//	while(1)
+//	{
+//		hallON();
+//		if(hallIsEnd())
+//		{
+//			printf("is near end\r\n");
+//		}
+//		else
+//			printf("far end\r\n");
+//		hallOFF();
+//		printf("---------------------\r\n");		
+//		HAL_Delay(1000);
+//	}	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -361,6 +373,11 @@ int main(void)
 					runState=RunOnState;
 					eepromReadValues();
 					playTone(toneStartRun);
+					printf("===========================\r\n");					
+					printf("goto RunState\r\n");
+					HAL_RTC_SetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
+					HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);					
+					hallON();
 				}
 				if(isKeyHold(KeyPower))
 				{
@@ -376,7 +393,10 @@ int main(void)
 			case RunState:
 				if(runState==RunOnState)
 				{
+					systemError=ERR_NONE;
 					clearSegs();
+					eepromReadValues();
+					HAL_Delay(50);
 					if(hallIsEnd())
 					{
 						playTone(toneAlarmNE);
@@ -387,9 +407,11 @@ int main(void)
 						systemError=ERR_NE;
 						printf("Error!Near End of path\r\n");
 					}
+					hallOFF();
 					setLED(LedSS,1);
 					prevSwitchFB=mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin);
 					motorDuty=motorCalcDuty();
+					printf("Calc Duty:%.1f\r\n",motorDuty);
 					if(motorDuty>100.0)
 					{
 						motorDuty=100.0;
@@ -413,12 +435,6 @@ int main(void)
 						motorErrNum=0;
 						runState=RunOffState;
 						gotoStopMode();
-						if(awu_flag)
-						{
-							awu_flag=0;
-							printf("AWU timeout!\r\n");
-							runState=RunOnState;
-						}
 					}
 					else
 					{
@@ -434,11 +450,10 @@ int main(void)
 							setLED(LedAlarm,1);
 							printf("error!exceed maximum motor error.\r\n");
 							machineState=StandbyState;
-							
 						}
 						else
 						{
-							printf("error!timout but go to mode\r\n");
+							printf("error!motor err %d\r\n",motorErrNum);
 							runState=RunOffState;
 							gotoStopMode();							
 						}
@@ -446,6 +461,16 @@ int main(void)
 				}
 				else
 				{
+					if(awu_flag)
+					{
+						awu_flag=0;
+							printf("AWU timeout led flag!\r\n");
+						setLED(LedSS,1);
+						rtc_flag=0;
+						while(!rtc_flag);
+						setLED(LedSS,0);
+						gotoStopMode();
+					}
 					if(isKeyPress(KeyPower))
 					{
 						playTone(toneBeep);
@@ -485,10 +510,10 @@ int main(void)
 						if(rtc_flag2s && motorIsStart())
 						{
 							rtc_flag2s=0;
-							printf("BatCur:%.2f (mA)\r\n",(double)adcGetValue(adcBATCUR));
-							printf("MotCur:%.2f(mA)\r\n",(double)adcGetValue(adcMOTCUR));
-							printf("HallVolt:%.1f (mv)\r\n",(double)adcGetValue(adcHALVOLT));
-							printf("BatVolt:%.1f (mv)\r\n",(double)adcGetValue(adcBATVOLT));
+							printf("BatCur:%d |%.2f (mA)\r\n",adcGetRaw(adcBATCUR),(double)adcGetValue(adcBATCUR));
+							printf("MotCur:%d |%.2f(mA)\r\n",adcGetRaw(adcMOTCUR),(double)adcGetValue(adcMOTCUR));
+							printf("HallVolt:%d |%.1f (mv)\r\n",adcGetRaw(adcHALVOLT),(double)adcGetValue(adcHALVOLT));
+							printf("BatVolt:%d |%.1f (mv)\r\n",adcGetRaw(adcBATVOLT),(double)adcGetValue(adcBATVOLT));
 							printf("=====================================================\r\n");
 						}			
 						if(isKeyHold(KeyTime)&& !motorIsStart())
@@ -555,39 +580,16 @@ int main(void)
 							setLED(LedSS,0);
 							hallON();
 							submenuIndex=1;
-							printSegs("HF",1);
+							printSegs("HE",1);
 						}
 					break;
-					//---------------------1:VOLTHALLF setting-------------------------------//
+					//---------------------1:VOLTHALLE setting-------------------------------//
 					case 1:
 						if(rtc_flag2s)
 						{
 							rtc_flag2s=0;
-							printf("HallVolt:%.1f (mv)\r\n",(double)adcGetValue(adcHALVOLT));
-							printf("BatVolt:%.1f (mv)\r\n",(double)adcGetValue(adcBATVOLT));
-							printf("=====================================================\r\n");
-						}	
-						if(isKeyHold(KeySS))
-						{
-							playTone(toneBeep);
-							playTone(toneSave);
-							EE_WriteVariable(EE_ADD_VHALLF,(uint16_t)adcGetRaw(adcHALVOLT));
-							setLED(LedSS,1);
-							rtc_flag=0;
-							while(!rtc_flag);
-							setLED(LedSS,0);
-							hallON();
-							submenuIndex=2;
-							printSegs("HE",1);
-						}
-						break;
-					//---------------------2:VOLTHALLE setting-------------------------------//
-					case 2:
-						if(rtc_flag2s)
-						{
-							rtc_flag2s=0;
-							printf("HallVolt:%.1f (mv)\r\n",(double)adcGetValue(adcHALVOLT));
-							printf("BatVolt:%.1f (mv)\r\n",(double)adcGetValue(adcBATVOLT));
+							printf("HallVolt:%d | %.1f (mv)\r\n",adcGetRaw(adcHALVOLT),(double)adcGetValue(adcHALVOLT));
+							printf("BatVolt:%d |%.1f (mv)\r\n",adcGetRaw(adcBATVOLT),(double)adcGetValue(adcBATVOLT));
 							printf("=====================================================\r\n");
 						}						
 						if(isKeyHold(KeySS))
@@ -599,12 +601,35 @@ int main(void)
 							rtc_flag=0;
 							while(!rtc_flag);
 							setLED(LedSS,0);
+							hallON();
+							submenuIndex=2;
+							printSegs("HF",1);
+						}
+						break;
+					//---------------------2:VOLTHALLF setting-------------------------------//
+					case 2:
+						if(rtc_flag2s)
+						{
+							rtc_flag2s=0;
+							printf("HallVolt:%d | %.1f (mv)\r\n",adcGetRaw(adcHALVOLT),(double)adcGetValue(adcHALVOLT));
+							printf("BatVolt:%d |%.1f (mv)\r\n",adcGetRaw(adcBATVOLT),(double)adcGetValue(adcBATVOLT));
+							printf("=====================================================\r\n");
+						}	
+						if(isKeyHold(KeySS))
+						{
+							playTone(toneBeep);
+							playTone(toneSave);
+							EE_WriteVariable(EE_ADD_VHALLF,(uint16_t)adcGetRaw(adcHALVOLT));
+							setLED(LedSS,1);
+							rtc_flag=0;
+							while(!rtc_flag);
+							setLED(LedSS,0);
 							hallOFF();
 							submenuIndex=0;
 							tmp_uint16t=EEValue_PWM;
 							sprintf(msg,"%02d",tmp_uint16t);
-							printSegs(msg,1);
-						}
+							printSegs(msg,1);							
+						}						
 						break;						
 				}
 					//----------------------Exit Setup(standby)------------------------------//

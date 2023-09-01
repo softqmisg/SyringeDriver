@@ -40,4 +40,5 @@ syringedriverhw10_keil/user_hall.o: ..\Core\Src\user_hall.c \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_utils.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_cortex.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_pwr.h \
-  ..\Core\Inc\user_eeprom.h ..\Core\Inc\eeprom.h ..\Core\Inc\user_adc.h
+  ..\Core\Inc\user_eeprom.h ..\Core\Inc\eeprom.h ..\Core\Inc\user_adc.h \
+  ..\Core\Inc\adc.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h

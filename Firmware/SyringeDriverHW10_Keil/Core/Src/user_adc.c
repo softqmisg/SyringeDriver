@@ -7,10 +7,21 @@
 #define coeffMOTCUR 	1.611	//
 #define coeffHALVOLT 	1.788 //mv
 #define coeffBATVOLT 	4.6 //mv
+	/*--------------------------------------------------------------------------*/
+	__IO uint8_t adcCnvCmpflag=0;
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)	
+{
+	adcCnvCmpflag=1;
+}
+	/*--------------------------------------------------------------------------*/
 	uint16_t adcGetRaw(uint8_t channel)
 	{
+		adcCnvCmpflag=0;
+		while(!adcCnvCmpflag);
+		adcCnvCmpflag=0;
 		return adcRawValue[channel];
 	}
+	/*--------------------------------------------------------------------------*/
 	double adcGetValue(uint8_t channel)
 	{
 		return (double)adcRawValue[channel]*coeff[channel];

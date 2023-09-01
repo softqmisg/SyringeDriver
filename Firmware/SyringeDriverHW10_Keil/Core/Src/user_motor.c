@@ -13,7 +13,17 @@ void motorStop()
 /*-----------------------------------------------------------------*/
 double motorCalcDuty(void)
 {
-	double r=(double)EEValue_VOLBAT*EEValue_PWM/(double)adcGetRaw(adcBATVOLT);
+	double r;
+	double batvolt=(double)adcGetRaw(adcBATVOLT);
+	batvolt=(double)adcGetRaw(adcBATVOLT);
+	if(batvolt>0)
+	{
+		r=(double)EEValue_VOLBAT*EEValue_PWM/batvolt;
+	}
+	else
+	{
+		r=0;
+	}
 	return r;
 }
 /*-----------------------------------------------------------------*/
