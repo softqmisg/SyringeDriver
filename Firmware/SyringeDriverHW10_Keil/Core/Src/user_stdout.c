@@ -42,8 +42,10 @@
 extern UART_HandleTypeDef huart3;
 int stdout_putchar (int ch) {
   // ...
+#if __DEBUG__==1	
 	while(HAL_UART_GetState(&huart3)!=HAL_UART_STATE_READY);
 	if(HAL_UART_Transmit(&huart3,(uint8_t *)&ch,1,HAL_MAX_DELAY)==HAL_OK)
 		return ch;
+#endif 	
   return (-1);
 }

@@ -24,7 +24,7 @@ void setAlarm(RTC_AlarmTypeDef *sAlarm)
 	sAlarm->AlarmTime.Minutes=sTime.Minutes;
 	sAlarm->AlarmTime.Hours=sTime.Hours;
 
-	sAlarm->AlarmTime.Seconds+=2; //add ALARM every 1 Sec
+	sAlarm->AlarmTime.Seconds+=STOPWAKEUP_TICK; //add ALARM every 1 Sec
 	if(sAlarm->AlarmTime.Seconds>59)
 	{
 		sAlarm->AlarmTime.Seconds-=60;

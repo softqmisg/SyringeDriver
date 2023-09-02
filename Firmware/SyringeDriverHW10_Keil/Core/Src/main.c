@@ -190,7 +190,9 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
+#if __DEBUG__==1
   MX_USART3_UART_Init();
+#endif
   MX_RTC_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
@@ -243,6 +245,20 @@ int main(void)
 	while (1)
 	{
 		keypadRead();
+		if(rtc_flag)
+		{
+			rtc_flag=0;
+			adcGetRaw(adcBATVOLT);
+			if(adcGetValue(adcBATVOLT)<LOWBATVOLT_TH)
+			{
+				setLED(LedBat,1);
+				playTone(toneAlarm);
+				printSegs("EU",1);
+				while(1);
+			}
+			else
+				setLED(LedBat,0);
+		}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -464,7 +480,7 @@ int main(void)
 					if(awu_flag)
 					{
 						awu_flag=0;
-							printf("AWU timeout led flag!\r\n");
+						//printf("AWU timeout led flag!\r\n");
 						setLED(LedSS,1);
 						rtc_flag=0;
 						while(!rtc_flag);
