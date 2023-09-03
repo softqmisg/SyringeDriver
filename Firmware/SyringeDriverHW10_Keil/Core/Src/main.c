@@ -231,9 +231,10 @@ int main(void)
 	while (1)
 	{
 		keypadRead();
-		if(rtc_flag)
+		if(sysTick_flag2s)
 		{
-			rtc_flag=0;
+			sysTick_flag2s=0;
+			
 			adcGetRaw(adcBATVOLT);
 			if(adcGetValue(adcBATVOLT)<LOWBATVOLT_TH)
 			{

@@ -121,14 +121,7 @@ void gotoStopMode(void)
 	printf("Bye!\r\n");
 		keypadRead();
 	MX_GPIO_DeInit();
-//	HAL_GPIO_WritePin(LedBat_GPIO_Port,LedBat_Pin,GPIO_PIN_RESET);
-//	HAL_GPIO_WritePin(LedAlarm_GPIO_Port,LedAlarm_Pin,GPIO_PIN_RESET);
-//	HAL_GPIO_WritePin(LedSS_GPIO_Port,LedSS_Pin,GPIO_PIN_RESET);
-//	
-//	HAL_GPIO_WritePin(SegNum1_GPIO_Port,SegNum1_Pin,GPIO_PIN_SET);
-//	HAL_GPIO_WritePin(SegNum2_GPIO_Port,SegNum2_Pin,GPIO_PIN_SET);	
-
-	
+	//----------------Init ExtI for wakeup----------------
   sGpio.Pin = KeySS_Pin;
   sGpio.Mode = GPIO_MODE_IT_FALLING;
   sGpio.Pull = GPIO_NOPULL;
@@ -144,17 +137,15 @@ void gotoStopMode(void)
 	HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(EXTI1_IRQn);//PORTA.1
 
-
-	/*
-		stop Timers and ADC
-	*/
+	
+		//-------------------stop Timers and ADC
 	__HAL_RTC_ALARM_DISABLE_IT(&hrtc,RTC_IT_SEC);
 	HAL_TIM_Base_Stop_IT(&SEGMENT_TIMER);
 	HAL_TIM_Base_Stop_IT(&BUZZERPERIOD_TIMER);
 	HAL_TIM_Base_Stop(&BUZZERFREQ_TIMER);
 	HAL_ADC_Stop_DMA(&hadc1);
 	
-	//------------------------------------------------------
+	//-------------------set Alaram-----------------------------------
 	__HAL_RTC_ALARM_CLEAR_FLAG(&hrtc, RTC_FLAG_ALRAF);
 	HAL_NVIC_ClearPendingIRQ(RTC_IRQn);
 	HAL_NVIC_ClearPendingIRQ(RTC_Alarm_IRQn);
@@ -166,7 +157,7 @@ void gotoStopMode(void)
 	HAL_SuspendTick();
 	HAL_PWR_EnableSleepOnExit();
 	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON,PWR_STOPENTRY_WFI);
-	//---------------------------wakup stop--------------------
+	//---------------------------wakup stop and init peripheral--------------------
 	HAL_RTC_DeactivateAlarm(&hrtc,RTC_ALARM_A);
 		MX_GPIO_Init();		
 	HAL_TIM_MspPostInit(&htim2);
@@ -174,7 +165,7 @@ void gotoStopMode(void)
 	initSegs();
 	__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcRawValue,4);	
-printf("Hi!\r\n");
+	printf("Hi!\r\n");
 	if(runState==RunOnState)
 	{
 		awu_flag=0;
