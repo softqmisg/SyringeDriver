@@ -512,6 +512,7 @@ void HAL_PWR_EnterSTANDBYMode(void)
   __force_stores();
 #endif
   /* Request Wait For Interrupt */
+	//__DSB();
   __WFI();
 }
 

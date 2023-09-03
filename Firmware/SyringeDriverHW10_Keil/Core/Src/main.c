@@ -83,16 +83,67 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
+ // MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(LedBat_GPIO_Port, LedBat_Pin, GPIO_PIN_SET);
-  HAL_Delay(5000U);
-  HAL_GPIO_WritePin(LedBat_GPIO_Port, LedBat_Pin, GPIO_PIN_RESET);
+//  HAL_GPIO_WritePin(LedBat_GPIO_Port, LedBat_Pin, GPIO_PIN_SET);
+//  HAL_Delay(5000U);
+//  HAL_GPIO_WritePin(LedBat_GPIO_Port, LedBat_Pin, GPIO_PIN_RESET);
 
-  HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
+//  HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
+//  __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+//  HAL_PWR_EnterSTANDBYMode();
+ __HAL_RCC_PWR_CLK_ENABLE();
+   /* Insert 5 seconds delay */
+  if (__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
+  {
+    /* Clear Standby flag */
+    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
+  }	 
+  HAL_Delay(5000);
+
+ /* The Following Wakeup sequence is highly recommended prior to each Standby mode entry
+    mainly when using more than one wakeup source this is to not miss any wakeup event.
+     - Disable all used wakeup sources,
+     - Clear all related wakeup flags, 
+     - Re-enable all used wakeup sources,
+     - Enter the Standby mode.
+  */
+
+//	  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+//  __HAL_RCC_GPIOA_CLK_ENABLE();
+//		__HAL_RCC_GPIOB_CLK_ENABLE();
+//  __HAL_RCC_GPIOC_CLK_ENABLE();
+//  __HAL_RCC_GPIOD_CLK_ENABLE();
+
+//  /*Configure GPIO pin Output Level */
+
+//  /*Configure GPIO pin : PtPin */
+//  GPIO_InitStruct.Pin = GPIO_PIN_All;
+//  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+//  GPIO_InitStruct.Pull = GPIO_NOPULL;
+//  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+//  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+//  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+//  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+//  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+		
+	
+	
+  /* Disable all used wakeup sources: PWR_WAKEUP_PIN1 */
+  HAL_PWR_DisableWakeUpPin(PWR_WAKEUP_PIN1);
+
+  /* Clear all related wakeup flags*/
   __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+  
+  /* Enable WakeUp Pin PWR_WAKEUP_PIN1 connected to PA.00 */
+  HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
+//	__HAL_RCC_APB1_FORCE_RESET
+//	__HAL_RCC_PWR_CLK_ENABLE();
+	
+  /* Enter the Standby mode */
   HAL_PWR_EnterSTANDBYMode();
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -119,7 +170,10 @@ void SystemClock_Config(void)
   * in the RCC_OscInitTypeDef structure.
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSEState        = RCC_HSE_OFF;
+  RCC_OscInitStruct.LSEState        = RCC_LSE_OFF;	
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
