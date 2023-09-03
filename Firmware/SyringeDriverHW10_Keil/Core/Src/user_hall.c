@@ -5,12 +5,12 @@
 #include <stdio.h>
 void hallON()
 {
-		HAL_TIM_PWM_Start(&motorTIMER,motorCHANNEL1);
+	motorPositive(1);
 }
 /*-------------------------------------------------------------*/
 void hallOFF()
 {
-		HAL_TIM_PWM_Stop(&motorTIMER,motorCHANNEL1);
+	motorPositive(0);
 }
 /*-------------------------------------------------------------*/
 uint8_t hallIsEnd()

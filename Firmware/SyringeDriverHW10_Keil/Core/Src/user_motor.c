@@ -4,10 +4,22 @@
 __IO uint8_t motorIsStartlocal=0;
 __IO uint8_t motorErrNum=0;
 /*-----------------------------------------------------------------*/
+void motorPositive(uint8_t onoff)
+{
+	if(onoff)
+	{
+		HAL_GPIO_WritePin(MOTORP_GPIO_Port,MOTORP_Pin,GPIO_PIN_SET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(MOTORP_GPIO_Port,MOTORP_Pin,GPIO_PIN_RESET);
+	}
+}
+/*-----------------------------------------------------------------*/
 void motorStop()
 {
 	HAL_TIM_PWM_Stop(&motorTIMER,motorCHANNEL2);
-	HAL_TIM_PWM_Stop(&motorTIMER,motorCHANNEL1);
+	motorPositive(0);
 	motorIsStartlocal=0;
 }
 /*-----------------------------------------------------------------*/
@@ -33,7 +45,7 @@ void motorStart(double percent)
 	uint16_t compare=(uint16_t) ((double)arr*percent/100.0);
 	if(compare>arr)
 		compare=arr;
-	HAL_TIM_PWM_Start(&motorTIMER,motorCHANNEL1);
+	motorPositive(1);
 	__HAL_TIM_SET_COMPARE(&motorTIMER,motorCHANNEL2,compare);      
 	HAL_TIM_PWM_Start(&motorTIMER,motorCHANNEL2);	
 	motorIsStartlocal=1;

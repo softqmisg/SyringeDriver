@@ -72,15 +72,15 @@ mState_t machineState=NoneState;
 rState_t runState=RunNoneState;
 
 // ----------------------Systick callback-----------------------------------------
-__IO uint16_t sysTick_cnt1s=0;
-__IO uint8_t sysTick_flag1s=0;
+__IO uint16_t sysTick_cnt2s=0;
+__IO uint8_t sysTick_flag2s=0;
 void HAL_SYSTICK_Callback(void)
 {
-	sysTick_cnt1s++;
-	if(sysTick_cnt1s>=1000)
+	sysTick_cnt2s++;
+	if(sysTick_cnt2s>=2000)
 	{
-		sysTick_cnt1s=0;
-		sysTick_flag1s=1;
+		sysTick_cnt2s=0;
+		sysTick_flag2s=1;
 	}
 }
 /*----------------------------------------------------------------------*/
@@ -190,9 +190,9 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
-#if __DEBUG__==1
+	#if __DEBUG__
   MX_USART3_UART_Init();
-#endif
+	#endif
   MX_RTC_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
@@ -224,20 +224,6 @@ int main(void)
 	HAL_ADCEx_Calibration_Start(&hadc1);
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcRawValue,4);
 	
-//	eepromReadValues();
-//	while(1)
-//	{
-//		hallON();
-//		if(hallIsEnd())
-//		{
-//			printf("is near end\r\n");
-//		}
-//		else
-//			printf("far end\r\n");
-//		hallOFF();
-//		printf("---------------------\r\n");		
-//		HAL_Delay(1000);
-//	}	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -338,6 +324,13 @@ int main(void)
 				break;
 			//---------------------UpState------------------------------------//
 			case UpState:
+				if(mPinRead(KeyType_GPIO_Port,KeyType_Pin)==GPIO_PIN_RESET && mPinRead(KeyTime_GPIO_Port,KeyTime_Pin)==GPIO_PIN_RESET )
+				{
+					motorDuty=motorCalcDuty();
+					motorStart(motorDuty);
+					HAL_Delay(5000);
+					motorStop();
+				}
 				if(isKeyPress(KeyTime))
 				{
 					playTone(toneBeep);
@@ -441,9 +434,9 @@ int main(void)
 						printf("Error!Duty cycle more than %%100\r\n");
 					}
 					motorStart(motorDuty);
-					sysTick_cnt1s=0;
-					sysTick_flag1s=0;
-					while(!sysTick_flag1s && prevSwitchFB==mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin));
+					sysTick_cnt2s=0;
+					sysTick_flag2s=0;sysTick_cnt2s=0;
+					while(!sysTick_flag2s && prevSwitchFB==mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin));
 					motorStop();
 					setLED(LedSS,0);
 					if(prevSwitchFB!=mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin))
@@ -508,6 +501,7 @@ int main(void)
 					if(isKeyHold(KeySS))
 					{
 						playTone(toneBeep);
+						playToneReverse(toneStartRun);						
 						machineState=UpState;
 						GoStandbyCnt=DELAY_GOSTANDBY;
 						typeSwitchcnt=1;
@@ -675,13 +669,11 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSE;
-  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -691,17 +683,17 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
     Error_Handler();
   }
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_ADC;
-  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {

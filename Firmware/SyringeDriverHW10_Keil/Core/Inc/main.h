@@ -88,6 +88,8 @@ void Error_Handler(void);
 #define LedBat_GPIO_Port GPIOB
 #define SwitchFB_Pin GPIO_PIN_15
 #define SwitchFB_GPIO_Port GPIOB
+#define MOTORP_Pin GPIO_PIN_8
+#define MOTORP_GPIO_Port GPIOA
 #define LedAlarm_Pin GPIO_PIN_11
 #define LedAlarm_GPIO_Port GPIOA
 #define LedSS_Pin GPIO_PIN_12
