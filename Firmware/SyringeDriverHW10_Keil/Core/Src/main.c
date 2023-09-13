@@ -126,6 +126,7 @@ void setLED(Led_t led,uint8_t state)
 /*----------------------------------------------------------------------*/
 void checkingSystem(void)
 {
+	HAL_Delay(3000);
 	char msg[3];
 	setLED(LedBat,1);
 	setLED(LedAlarm,1);
@@ -166,6 +167,8 @@ int main(void)
 	double motorDuty=0.0;
 	RTC_TimeTypeDef sTime={0};
 	RTC_DateTypeDef sDate={.Year=0x0,.Date=0x01,.Month=RTC_MONTH_JANUARY,.WeekDay=RTC_WEEKDAY_MONDAY};
+	uint8_t first_presstype=1;
+	uint8_t first_presstime=1;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -274,6 +277,8 @@ int main(void)
 					submenuIndex=0;
 					sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
 					printSegs(msg,0);					
+					first_presstime=0;
+					first_presstype=1;
 				}
 				if(isKeyPress(KeyPower))
 				{
@@ -315,7 +320,9 @@ int main(void)
 						typeSwitchcnt=1;
 						submenuIndex=0;
 						sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
-						printSegs(msg,0);								
+						printSegs(msg,0);
+						first_presstime=0;
+						first_presstype=1;
 					}
 					else if(machineState==StandbyState)
 					{
@@ -325,10 +332,15 @@ int main(void)
 				break;
 			//---------------------UpState------------------------------------//
 			case UpState:
-				if(mPinRead(KeyType_GPIO_Port,KeyType_Pin)==GPIO_PIN_RESET && mPinRead(KeyTime_GPIO_Port,KeyTime_Pin)==GPIO_PIN_RESET )
+				//bolus
+//				if(mPinRead(KeyType_GPIO_Port,KeyType_Pin)==GPIO_PIN_RESET && mPinRead(KeyTime_GPIO_Port,KeyTime_Pin)==GPIO_PIN_RESET )
+				if(isKeyHold(KeyType|KeyTime ))
 				{
+					playTone(toneBeep);
+					eepromReadValues();
 					motorDuty=motorCalcDuty();
 					motorStart(motorDuty);
+					GoStandbyCnt=DELAY_GOSTANDBY;
 					HAL_Delay(5000);
 					motorStop();
 				}
@@ -337,7 +349,15 @@ int main(void)
 					playTone(toneBeep);
 					typeSwitchcnt=1;
 					submenuIndex=0;
-					EEValue_TIMEINDEX++;
+					if(!first_presstime)
+					{
+						EEValue_TIMEINDEX++;
+					}
+					else
+					{
+						first_presstime=0;
+						first_presstype=1;
+					}
 					if(EEValue_TIMEINDEX>=MAX_TIMEINDEX)
 						EEValue_TIMEINDEX=0;
 					EE_WriteVariable(EE_ADD_TIMEINDEX,EEValue_TIMEINDEX);
@@ -350,7 +370,15 @@ int main(void)
 					playTone(toneBeep);
 					typeSwitchcnt=1;
 					submenuIndex=1;
-					EEValue_TYPEINDEX++;
+					if(!first_presstype)
+					{
+						EEValue_TYPEINDEX++;
+					}
+					else
+					{
+						first_presstime=1;
+						first_presstype=0;
+					}
 					if(EEValue_TYPEINDEX>=MAX_TYPEINDEX)
 						EEValue_TYPEINDEX=0;
 					EE_WriteVariable(EE_ADD_TYPEINDEX,EEValue_TYPEINDEX);
@@ -379,6 +407,8 @@ int main(void)
 				if(isKeyHold(KeySS))
 				{
 					playTone(toneBeep);
+					rtc_flag2s=0;rtc_cnt2s=0;
+					while(!rtc_flag2s);
 					machineState=RunState;
 					runState=RunOnState;
 					eepromReadValues();
@@ -493,8 +523,8 @@ int main(void)
 							sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
 							printSegs(msg,0);
 						}
-						rtc_flag=0;
-						while(!rtc_flag);
+						rtc_flag2s=0;rtc_cnt2s=0;
+						while(!rtc_flag2s);
 						clearSegs();
 						runState=RunOffState;
 						gotoStopMode();
@@ -520,7 +550,7 @@ int main(void)
 					case 0:
 						if(rtc_flag2s && motorIsStart())
 						{
-							rtc_flag2s=0;
+							rtc_flag2s=0;rtc_cnt2s=0;
 							printf("BatCur:%d |%.2f (mA)\r\n",adcGetRaw(adcBATCUR),(double)adcGetValue(adcBATCUR));
 							printf("MotCur:%d |%.2f(mA)\r\n",adcGetRaw(adcMOTCUR),(double)adcGetValue(adcMOTCUR));
 							printf("HallVolt:%d |%.1f (mv)\r\n",adcGetRaw(adcHALVOLT),(double)adcGetValue(adcHALVOLT));
@@ -598,7 +628,7 @@ int main(void)
 					case 1:
 						if(rtc_flag2s)
 						{
-							rtc_flag2s=0;
+							rtc_flag2s=0;rtc_cnt2s=0;
 							printf("HallVolt:%d | %.1f (mv)\r\n",adcGetRaw(adcHALVOLT),(double)adcGetValue(adcHALVOLT));
 							printf("BatVolt:%d |%.1f (mv)\r\n",adcGetRaw(adcBATVOLT),(double)adcGetValue(adcBATVOLT));
 							printf("=====================================================\r\n");
@@ -621,7 +651,7 @@ int main(void)
 					case 2:
 						if(rtc_flag2s)
 						{
-							rtc_flag2s=0;
+							rtc_flag2s=0;rtc_cnt2s=0;
 							printf("HallVolt:%d | %.1f (mv)\r\n",adcGetRaw(adcHALVOLT),(double)adcGetValue(adcHALVOLT));
 							printf("BatVolt:%d |%.1f (mv)\r\n",adcGetRaw(adcBATVOLT),(double)adcGetValue(adcBATVOLT));
 							printf("=====================================================\r\n");

@@ -1,8 +1,8 @@
 #ifndef __USER_SYRINGE_H__
 #define __USER_SYRINGE_H__
 #include "stm32f1xx_hal.h"
-#define RUNOFFLED_TICK	1 //s
-#define STOPWAKEUP_TICK	2 //s
+//#define RUNOFFLED_TICK	1 //s
+//#define STOPWAKEUP_TICK	2 //s
 
 #define ERR_NONE	0
 #define ERR_NE		1

@@ -58,6 +58,9 @@ void showSeg(char ch,uint8_t dp)
 		case 'n':
 			seg_value=0x54;
 			break;
+		case 'N':
+			seg_value=0x37;
+			break;		
 		case 'S':
 			seg_value=0x6D;
 			break;

@@ -110,7 +110,7 @@ void Error_Handler(void);
 #define KeyType_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define DELAY_GOSTANDBY	130
+#define DELAY_GOSTANDBY		30
 
 typedef enum {NoneState=0,WakeupState,NormalState,UpState,RunState,StandbyState,SetupState} mState_t;
 typedef enum {RunNoneState=0,RunOnState,RunOffState} rState_t;
