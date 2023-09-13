@@ -1,0 +1,4 @@
+Record=DiagramHierarchy|SourceDocument=Syringe_MultiBoardSchematic.MbsDoc|Kind=Multi-board Schematic Module|Designator=2|Source=..\KeypadHW10\KeypadHW10.PrjPcb
+Record=SubProject|SourceDocument=Syringe_MultiBoardSchematic.MbsDoc|ProjectPath=..\KeypadHW10\KeypadHW10.PrjPcb
+Record=DiagramHierarchy|SourceDocument=Syringe_MultiBoardSchematic.MbsDoc|Kind=Multi-board Schematic Module|Designator=1|Source=..\SyringeDriverHW10\SyringeDriverHW10.PrjPcb
+Record=SubProject|SourceDocument=Syringe_MultiBoardSchematic.MbsDoc|ProjectPath=..\SyringeDriverHW10\SyringeDriverHW10.PrjPcb
