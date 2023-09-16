@@ -218,8 +218,7 @@ void initSegs(void)
 {	
 	clearSegs();
 	HAL_TIM_Base_Start_IT(&SEGMENT_TIMER);
-	
-	
+
 }
 /*-----------------------------------------------------------------*/
 void printSegs(char *str,uint8_t blink)

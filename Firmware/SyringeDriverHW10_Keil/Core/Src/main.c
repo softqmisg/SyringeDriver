@@ -234,7 +234,7 @@ int main(void)
 	while (1)
 	{
 		keypadRead();
-		if(sysTick_flag2s)
+		if(sysTick_flag2s && machineState !=SetupState)
 		{
 			sysTick_flag2s=0;
 			

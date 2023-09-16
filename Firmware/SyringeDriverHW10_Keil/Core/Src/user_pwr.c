@@ -10,6 +10,7 @@
 #include "user_syringe.h"
 #include "user_eeprom.h"
 #include "user_hall.h"
+#include "user_motor.h"
 #include "user_sevensegment.h"
 #include <time.h>
 /*-----------------------------------------------------*/
@@ -138,13 +139,16 @@ void gotoStopMode(void)
 	HAL_NVIC_EnableIRQ(EXTI1_IRQn);//PORTA.1
 
 	
-		//-------------------stop Timers and ADC
+		//-------------------stop Timers and ADC-----------------------------------
 	__HAL_RTC_ALARM_DISABLE_IT(&hrtc,RTC_IT_SEC);
-	HAL_TIM_Base_Stop_IT(&SEGMENT_TIMER);
-	HAL_TIM_Base_Stop_IT(&BUZZERPERIOD_TIMER);
-	HAL_TIM_Base_Stop(&BUZZERFREQ_TIMER);
+	HAL_TIM_Base_Stop_IT(&SEGMENT_TIMER); 			//tim4
+	HAL_TIM_Base_Stop_IT(&BUZZERPERIOD_TIMER); //tim3
+	HAL_TIM_Base_Stop(&BUZZERFREQ_TIMER);			//tim2
+	muteTone();
+	motorStop();
 	HAL_ADC_Stop_DMA(&hadc1);
-	
+	HAL_ADC_MspDeInit(&hadc1);
+	HAL_FLASH_Lock();
 	//-------------------set Alaram-----------------------------------
 	__HAL_RTC_ALARM_CLEAR_FLAG(&hrtc, RTC_FLAG_ALRAF);
 	HAL_NVIC_ClearPendingIRQ(RTC_IRQn);
@@ -159,12 +163,15 @@ void gotoStopMode(void)
 	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON,PWR_STOPENTRY_WFI);
 	//---------------------------wakup stop and init peripheral--------------------
 	HAL_RTC_DeactivateAlarm(&hrtc,RTC_ALARM_A);
-		MX_GPIO_Init();		
-	HAL_TIM_MspPostInit(&htim2);
-		keypadRead();
+	HAL_FLASH_Unlock();
+	MX_GPIO_Init();		
+	HAL_ADC_MspInit(&hadc1);
+	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcRawValue,4);	
+
+	HAL_TIM_MspPostInit(&BUZZERFREQ_TIMER);
+	keypadRead();
 	initSegs();
 	__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
-	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcRawValue,4);	
 	printf("Hi!\r\n");
 	if(runState==RunOnState)
 	{
