@@ -244,7 +244,8 @@ int main(void)
 				setLED(LedBat,1);
 				playTone(toneAlarm);
 				printSegs("EU",1);
-				while(1);
+				HAL_Delay(15000);
+				machineState=StandbyState;
 			}
 			else
 				setLED(LedBat,0);
