@@ -126,14 +126,14 @@ void setLED(Led_t led,uint8_t state)
 /*----------------------------------------------------------------------*/
 void checkingSystem(void)
 {
-	HAL_Delay(3000);
+
 	char msg[3];
+		playTone(toneBeep);
 	setLED(LedBat,1);
 	setLED(LedAlarm,1);
 	setLED(LedSS,1);
 	printDPSegs(" .");
-	HAL_Delay(500);
-	playTone(toneBeep);
+	HAL_Delay(3000);
 	clearSegs();
 	setLED(LedBat,0);
 	setLED(LedAlarm,0);
@@ -407,10 +407,9 @@ int main(void)
 				if(isKeyHold(KeySS))
 				{
 					playTone(toneBeep);
-					rtc_flag2s=0;rtc_cnt2s=0;
-					while(!rtc_flag2s);
 					machineState=RunState;
 					runState=RunOnState;
+					setLED(LedSS,1);
 					eepromReadValues();
 					playTone(toneStartRun);
 					printf("===========================\r\n");					
@@ -418,6 +417,8 @@ int main(void)
 					HAL_RTC_SetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
 					HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);					
 					hallON();
+					rtc_flag2s=0;rtc_cnt2s=0;
+					while(!rtc_flag2s);					
 				}
 				if(isKeyHold(KeyPower))
 				{
@@ -532,7 +533,8 @@ int main(void)
 					if(isKeyHold(KeySS))
 					{
 						playTone(toneBeep);
-						playToneReverse(toneStartRun);						
+						playToneReverse(toneStartRun);
+						HAL_TIM_MspPostInit(&htim1);						
 						machineState=UpState;
 						GoStandbyCnt=DELAY_GOSTANDBY;
 						typeSwitchcnt=1;

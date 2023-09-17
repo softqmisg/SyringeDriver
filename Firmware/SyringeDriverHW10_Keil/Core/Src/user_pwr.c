@@ -148,7 +148,6 @@ void gotoStopMode(void)
 	motorStop();
 	HAL_ADC_Stop_DMA(&hadc1);
 	HAL_ADC_MspDeInit(&hadc1);
-	HAL_FLASH_Lock();
 	//-------------------set Alaram-----------------------------------
 	__HAL_RTC_ALARM_CLEAR_FLAG(&hrtc, RTC_FLAG_ALRAF);
 	HAL_NVIC_ClearPendingIRQ(RTC_IRQn);
@@ -163,7 +162,6 @@ void gotoStopMode(void)
 	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON,PWR_STOPENTRY_WFI);
 	//---------------------------wakup stop and init peripheral--------------------
 	HAL_RTC_DeactivateAlarm(&hrtc,RTC_ALARM_A);
-	HAL_FLASH_Unlock();
 	MX_GPIO_Init();		
 	HAL_ADC_MspInit(&hadc1);
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcRawValue,4);	
