@@ -160,7 +160,7 @@ void keypadRead() {
 }
 
 uint8_t isKeyDown(uint16_t m) {
-	return ((keypad.keysDown == (m)) && (keypad.keysReleased == 0));
+	return ((keypad.keysDown&m));// && (keypad.keysReleased == 0));
 }
 
 uint8_t isKeyPress(uint16_t m) {

@@ -87,6 +87,8 @@ void HAL_SYSTICK_Callback(void)
 __IO uint8_t rtc_flag=0;
 __IO uint8_t rtc_flag2s=0;
 __IO uint8_t rtc_cnt2s=0;
+__IO uint8_t rtc_flag5s=0;
+__IO uint8_t rtc_cnt5s=0;
 __IO uint8_t GoStandbyCnt=0;
 void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 {
@@ -96,6 +98,15 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 	{
 		rtc_cnt2s=0;
 		rtc_flag2s=1;
+	}
+	if(machineState==BolusState)
+	{
+		rtc_cnt5s++;
+		if(rtc_cnt5s>5)
+		{
+			rtc_flag5s=1;
+			rtc_cnt5s=0;
+		}
 	}
 	if(GoStandbyCnt)
 		GoStandbyCnt--;	
@@ -316,7 +327,6 @@ int main(void)
 					{
 						checkingSystem();
 						printf("goto Upstate\r\n");
-						
 						GoStandbyCnt=DELAY_GOSTANDBY;
 						typeSwitchcnt=1;
 						submenuIndex=0;
@@ -331,19 +341,39 @@ int main(void)
 					}
 				}
 				break;
+			//---------------------BlousState------------------------------------//
+				
+			case BolusState:
+				if(!isKeyDown(KeyType )|| !isKeyDown(KeyTime ) || rtc_flag5s)
+				{
+					rtc_flag5s=0;
+					motorStop();
+					machineState=UpState;
+					printf("goto Upstate\r\n");
+					GoStandbyCnt=DELAY_GOSTANDBY;
+					typeSwitchcnt=1;
+					submenuIndex=0;
+					sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
+					printSegs(msg,0);
+					first_presstime=0;
+					first_presstype=1;
+				}
+				break;
 			//---------------------UpState------------------------------------//
 			case UpState:
 				//bolus
 //				if(mPinRead(KeyType_GPIO_Port,KeyType_Pin)==GPIO_PIN_RESET && mPinRead(KeyTime_GPIO_Port,KeyTime_Pin)==GPIO_PIN_RESET )
 				if(isKeyHold(KeyType|KeyTime ))
 				{
+					machineState=BolusState;
 					playTone(toneBeep);
 					eepromReadValues();
 					motorDuty=motorCalcDuty();
 					motorStart(motorDuty);
 					GoStandbyCnt=DELAY_GOSTANDBY;
-					HAL_Delay(5000);
-					motorStop();
+					rtc_flag5s=0;
+					rtc_cnt5s=0;
+					printSegs("bO",1);
 				}
 				if(isKeyPress(KeyTime))
 				{
@@ -419,7 +449,9 @@ int main(void)
 					HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);					
 					hallON();
 					rtc_flag2s=0;rtc_cnt2s=0;
-					while(!rtc_flag2s);					
+					while(!rtc_flag2s);	
+					rtc_flag2s=0;	
+					motorErrNum=0;
 				}
 				if(isKeyHold(KeyPower))
 				{
@@ -457,13 +489,13 @@ int main(void)
 					if(motorDuty>100.0)
 					{
 						motorDuty=100.0;
-						if(systemError!=ERR_NONE)
-							playTone(toneAlarmNE);
-						setLED(LedAlarm,1);
-						rtc_flag=0;
-						while(!rtc_flag);
-						setLED(LedAlarm,0);
-						systemError=ERR_DU;
+//						if(systemError!=ERR_NONE)
+//							playTone(toneAlarmNE);
+//						setLED(LedAlarm,1);
+//						rtc_flag=0;
+//						while(!rtc_flag);
+//						setLED(LedAlarm,0);
+//						systemError=ERR_DU;
 						printf("Error!Duty cycle more than %%100\r\n");
 					}
 					motorStart(motorDuty);
@@ -534,7 +566,7 @@ int main(void)
 					if(isKeyHold(KeySS))
 					{
 						playTone(toneBeep);
-						playToneReverse(toneStartRun);
+						playTone(toneStopRun);
 						HAL_TIM_MspPostInit(&htim1);						
 						machineState=UpState;
 						GoStandbyCnt=DELAY_GOSTANDBY;

@@ -29,16 +29,16 @@ void showSeg(char ch,uint8_t dp)
 			seg_value=109;
 			break;
 		case '6':
-			seg_value=125;
+			seg_value=0x7D;
 			break;
 		case '7':
-			seg_value=7;
+			seg_value=0x07;
 			break;
 		case '8':
 			seg_value=0x7F;
 			break;
 		case '9':
-			seg_value=111;
+			seg_value=0x6F;
 			break;
 		case 'C':
 			seg_value=0x39;
@@ -70,6 +70,12 @@ void showSeg(char ch,uint8_t dp)
 		case 'U':
 			seg_value=0x3E;
 			break;
+		case 'b':
+			seg_value=0x7c;
+			break;		
+		case 'O':
+			seg_value=0x3F;
+			break;		
 		default:
 			seg_value=127;			
 		break;
