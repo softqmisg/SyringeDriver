@@ -269,7 +269,7 @@ int main(void)
 				{
 					playTone(toneBeep);
 					machineState=UpState;
-					EE_WriteVariable(EE_ADD_MSTATE,(uint16_t)machineState);
+//					EE_WriteVariable(EE_ADD_MSTATE,(uint16_t)machineState);
 					eepromReadValues();
 					printf("change to UpState\r\n");
 					playTone(tonePowerWake);

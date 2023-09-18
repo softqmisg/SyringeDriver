@@ -121,7 +121,7 @@ extern mState_t machineState;
 extern rState_t runState;
 void setLED(Led_t led,uint8_t state);
 
-#define __DEBUG__	0
+#define __DEBUG__	1
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
