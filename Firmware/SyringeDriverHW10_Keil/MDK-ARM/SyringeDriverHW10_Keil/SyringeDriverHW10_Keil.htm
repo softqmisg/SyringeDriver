@@ -3,7 +3,7 @@
 <title>Static Call Graph - [SyringeDriverHW10_Keil\SyringeDriverHW10_Keil.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image SyringeDriverHW10_Keil\SyringeDriverHW10_Keil.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Thu Aug 31 22:49:34 2023
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Mon Sep 18 23:07:48 2023
 <BR><P>
 <H3>Maximum Stack Usage =        236 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -860,7 +860,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[ae]"></a>HAL_TIM_GenerateEvent</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_GenerateEvent))
-<BR><BR>[Called By]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playToneReverse
+<BR><BR>[Called By]<UL><LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playToneReverse
 <LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playTone
 </UL>
 
@@ -911,7 +911,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[ad]"></a>HAL_TIM_OC_Start_IT</STRONG> (Thumb, 280 bytes, Stack size 0 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_OC_Start_IT))
-<BR><BR>[Called By]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playToneReverse
+<BR><BR>[Called By]<UL><LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playToneReverse
 <LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playTone
 </UL>
 
@@ -949,7 +949,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[ac]"></a>HAL_TIM_PWM_Start</STRONG> (Thumb, 222 bytes, Stack size 0 bytes, stm32f1xx_hal_tim.o(.text.HAL_TIM_PWM_Start))
-<BR><BR>[Called By]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playToneReverse
+<BR><BR>[Called By]<UL><LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playToneReverse
 <LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playTone
 </UL>
 
@@ -1017,7 +1017,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[93]"></a>MX_GPIO_Init</STRONG> (Thumb, 244 bytes, Stack size 48 bytes, gpio.o(.text.MX_GPIO_Init))
+<P><STRONG><a name="[93]"></a>MX_GPIO_Init</STRONG> (Thumb, 264 bytes, Stack size 48 bytes, gpio.o(.text.MX_GPIO_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 92<LI>Call Chain = MX_GPIO_Init &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_Init
@@ -1185,7 +1185,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[a7]"></a>isKeyPress</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, user_keypad.o(.text.isKeyPress))
+<P><STRONG><a name="[aa]"></a>isKeyPress</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, user_keypad.o(.text.isKeyPress))
 <BR><BR>[Called By]<UL><LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -1200,7 +1200,7 @@ Global Symbols
 <LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_EXTI_Callback
 </UL>
 
-<P><STRONG><a name="[44]"></a>main</STRONG> (Thumb, 366 bytes, Stack size 80 bytes, main.o(.text.main))
+<P><STRONG><a name="[44]"></a>main</STRONG> (Thumb, 378 bytes, Stack size 80 bytes, main.o(.text.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 236 + Unknown Stack Size
 <LI>Call Chain = main &rArr; MX_TIM1_Init &rArr; HAL_GPIO_Init
 </UL>
@@ -1219,11 +1219,11 @@ Global Symbols
 <LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_OscConfig
 <LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Init
 <LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;isKeyHold
-<LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;isKeyPress
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;isKeyPress
 <LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;printSegs
 <LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initSegs
 <LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keypadRead
-<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playToneReverse
+<LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playToneReverse
 <LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playTone
 <LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;muteTone
 <LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2sprintf
@@ -1250,7 +1250,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[aa]"></a>playToneReverse</STRONG> (Thumb, 218 bytes, Stack size 8 bytes, user_buzzer.o(.text.playToneReverse))
+<P><STRONG><a name="[a7]"></a>playToneReverse</STRONG> (Thumb, 218 bytes, Stack size 8 bytes, user_buzzer.o(.text.playToneReverse))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = playToneReverse
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_GenerateEvent
