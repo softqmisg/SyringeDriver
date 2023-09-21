@@ -99,7 +99,7 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 		rtc_cnt2s=0;
 		rtc_flag2s=1;
 	}
-	if(machineState==BolusState)
+	if(machineState==BolusState || machineState==RunState)
 	{
 		rtc_cnt5s++;
 		if(rtc_cnt5s>5)
@@ -204,9 +204,7 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
-	#if __DEBUG__
   MX_USART3_UART_Init();
-	#endif
   MX_RTC_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
@@ -467,8 +465,8 @@ int main(void)
 			case RunState:
 				if(runState==RunOnState)
 				{
+
 					systemError=ERR_NONE;
-					clearSegs();
 					eepromReadValues();
 					HAL_Delay(50);
 					if(hallIsEnd())
@@ -481,7 +479,6 @@ int main(void)
 						systemError=ERR_NE;
 						printf("Error!Near End of path\r\n");
 					}
-					hallOFF();
 					setLED(LedSS,1);
 					prevSwitchFB=mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin);
 					motorDuty=motorCalcDuty();
@@ -498,8 +495,8 @@ int main(void)
 //						systemError=ERR_DU;
 						printf("Error!Duty cycle more than %%100\r\n");
 					}
+					clearSegs();
 					motorStart(motorDuty);
-					sysTick_cnt2s=0;
 					sysTick_flag2s=0;sysTick_cnt2s=0;
 					while(!sysTick_flag2s && prevSwitchFB==mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin));
 					motorStop();
@@ -650,9 +647,14 @@ int main(void)
 							playTone(toneBeep);
 							playTone(toneSave);
 							EE_WriteVariable(EE_ADD_PWM,(uint16_t)tmp_uint16t);
-							EE_WriteVariable(EE_ADD_VOLBAT,(uint16_t)adcGetRaw(adcBATVOLT));
+							uint32_t volt=0;
+							for(uint8_t i=0;i<8;i++)
+								volt+=(uint32_t)adcGetRaw(adcBATVOLT);
+							volt=volt>>3;
+							EE_WriteVariable(EE_ADD_VOLBAT,(uint16_t)volt);
 							eepromReadValues();
 							motorStop();
+							printf("saved:volt=%d,pwm=%d\r\n",volt,tmp_uint16t);
 							setLED(LedSS,0);
 							hallON();
 							submenuIndex=1;

@@ -12,6 +12,7 @@
 #include "user_hall.h"
 #include "user_motor.h"
 #include "user_sevensegment.h"
+#include "usart.h"
 #include <time.h>
 /*-----------------------------------------------------*/
 void setAlarm(RTC_AlarmTypeDef *sAlarm,uint8_t delay)
@@ -181,6 +182,9 @@ void gotoStopMode(void)
 		HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);
 		hallON();
 		HAL_TIM_MspPostInit(&htim1);
+	#if __DEBUG__
+  MX_USART3_UART_Init();
+	#endif
 	}	
 }
 /*-----------------------------------------------------*/

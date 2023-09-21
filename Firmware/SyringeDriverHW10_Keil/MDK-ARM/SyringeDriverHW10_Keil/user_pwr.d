@@ -45,5 +45,5 @@ syringedriverhw10_keil/user_pwr.o: ..\Core\Src\user_pwr.c \
   ..\Core\Inc\Tones_Pitches.h ..\Core\Inc\user_keypad.h \
   ..\Core\Inc\user_syringe.h ..\Core\Inc\user_eeprom.h \
   ..\Core\Inc\eeprom.h ..\Core\Inc\user_hall.h ..\Core\Inc\user_motor.h \
-  ..\Core\Inc\user_sevensegment.h \
+  ..\Core\Inc\user_sevensegment.h ..\Core\Inc\usart.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\time.h
