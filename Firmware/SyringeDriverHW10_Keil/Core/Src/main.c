@@ -146,19 +146,31 @@ void checkingSystem(void)
 	printDPSegs(" .");
 	HAL_Delay(3000);
 	clearSegs();
-	setLED(LedBat,0);
-	setLED(LedAlarm,0);
-	setLED(LedSS,0);
 	for(uint8_t i=0;i<9;i++)
 	{
 		sprintf(msg,"%d%d",i,i);
 		printSegs(msg,0);
 		HAL_Delay(200);		
 	}
-	printSegs("  ",0);
-	printDPSegs("..");HAL_Delay(200);
-	clearSegs();	
-	playTone(tonePowerWake);
+	printSegs("88",0);
+	printDPSegs("..");
+	HAL_Delay(200);
+	if(adcGetValue(adcBATVOLT)<ULTRALOWVOLT_TH)
+	{
+		playTone(toneAlarm);
+		printSegs("UL",1);
+		HAL_Delay(2000);
+		gotoStandbyMode(0);
+	}
+	else
+	{
+	
+		setLED(LedBat,0);
+		setLED(LedAlarm,0);
+		setLED(LedSS,0);
+		clearSegs();	
+		playTone(tonePowerWake);
+	}
 }
 /* USER CODE END 0 */
 
@@ -235,7 +247,11 @@ int main(void)
 	__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
 	HAL_ADCEx_Calibration_Start(&hadc1);
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcRawValue,4);
-	
+	rtc_flag=0;
+	rtc_flag2s=0;rtc_cnt2s=0;
+	rtc_flag5s=0;rtc_cnt5s=0;
+	sysTick_flag2s=0;	sysTick_cnt2s=0;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -278,17 +294,26 @@ int main(void)
 				{
 					playTone(toneBeep);
 					machineState=UpState;
-//					EE_WriteVariable(EE_ADD_MSTATE,(uint16_t)machineState);
 					eepromReadValues();
 					printf("change to UpState\r\n");
 					playTone(tonePowerWake);
-					GoStandbyCnt=DELAY_GOSTANDBY;
-					typeSwitchcnt=1;
-					submenuIndex=0;
-					sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
-					printSegs(msg,0);					
-					first_presstime=0;
-					first_presstype=1;
+					if(adcGetValue(adcBATVOLT)<ULTRALOWVOLT_TH)
+					{
+						playTone(toneAlarm);
+						printSegs("UL",1);
+						HAL_Delay(2000);
+						gotoStandbyMode(0);
+					}
+					else
+					{
+						GoStandbyCnt=DELAY_GOSTANDBY;
+						typeSwitchcnt=1;
+						submenuIndex=0;
+						sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
+						printSegs(msg,0);					
+						first_presstime=0;
+						first_presstype=1;
+					}
 				}
 				if(isKeyPress(KeyPower))
 				{

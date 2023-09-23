@@ -76,6 +76,9 @@ void showSeg(char ch,uint8_t dp)
 		case 'O':
 			seg_value=0x3F;
 			break;		
+		case 'L': //0b0111000
+			seg_value=0x38;
+			break;				
 		default:
 			seg_value=127;			
 		break;

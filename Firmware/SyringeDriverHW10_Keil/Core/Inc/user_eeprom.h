@@ -21,7 +21,7 @@
 #define	DEFAULT_VHALLF		340  //mv 
 #define DEFAULT_VHALLE		370 //mv 
 #define DEFAULT_CURMOT		100   //ma
-#define DEFAULT_VOLBAT		8500 //mv
+#define DEFAULT_VOLBAT		1942 //9V to digital=(9v*1M/5.75M)*(4096/3.3V)
 #define DEFAULT_CURBT			50
 #define DEFAULT_MSTATE		UpState
 #define DEFAULT_TIMEINDEX	0

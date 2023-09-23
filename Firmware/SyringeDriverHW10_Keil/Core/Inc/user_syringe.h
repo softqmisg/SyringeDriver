@@ -9,7 +9,8 @@
 #define ERR_E5		2
 #define ERR_DU		3
 
-#define LOWBATVOLT_TH		6.0
+#define ULTRALOWVOLT_TH		6850 //mv noload of bat=6850+150=7000
+#define LOWBATVOLT_TH			7150 //ms noload of bat=7150+150=7300
 
 #define MAX_TIMEINDEX	10
 #define MAX_TYPEINDEX	2

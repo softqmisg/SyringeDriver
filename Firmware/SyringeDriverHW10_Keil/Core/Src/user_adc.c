@@ -2,7 +2,7 @@
 #include "tim.h"
 	uint16_t adcRawValue[4];
 	uint16_t adcCompleteValue[4];
-	double coeff[4]={1.611,1.611,1.788,4.6}; //batcur,motcur,halvolt,batvolt
+	double coeff[4]={1.611,1.611,1.788,4.63}; //batcur,motcur,halvolt,batvolt
 
 #define coeffBATCUR 	1.611
 #define coeffMOTCUR 	1.611	//
