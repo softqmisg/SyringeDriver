@@ -115,10 +115,16 @@ void Error_Handler(void);
 typedef enum {NoneState=0,WakeupState,NormalState,UpState,BolusState,RunState,StandbyState,SetupState} mState_t;
 typedef enum {RunNoneState=0,RunOnState,RunOffState} rState_t;
 typedef enum {LedBat,LedAlarm,LedSS} Led_t;
-extern __IO uint8_t rtc_flag;
-extern __IO uint8_t rtc_flag2s;
 extern mState_t machineState;
 extern rState_t runState;
+extern __IO uint8_t rtc_flag;
+extern __IO uint8_t rtc_flag2s;
+extern __IO uint8_t rtc_cnt2s;
+extern __IO uint8_t rtc_flag5s;
+extern __IO uint8_t rtc_cnt5s;
+extern __IO uint8_t sysTick_flag2s;
+extern __IO uint16_t sysTick_cnt2s;
+
 void setLED(Led_t led,uint8_t state);
 
 #define __DEBUG__	0

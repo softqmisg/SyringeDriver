@@ -262,14 +262,13 @@ int main(void)
 		if(sysTick_flag2s && machineState !=SetupState)
 		{
 			sysTick_flag2s=0;
-			
 			adcGetRaw(adcBATVOLT);
 			if(adcGetValue(adcBATVOLT)<LOWBATVOLT_TH)
 			{
 				setLED(LedBat,1);
 				playTone(toneAlarm);
 				printSegs("EU",1);
-				HAL_Delay(15000);
+				HAL_Delay(5000);
 				machineState=StandbyState;
 			}
 			else
@@ -490,10 +489,9 @@ int main(void)
 			case RunState:
 				if(runState==RunOnState)
 				{
-
 					systemError=ERR_NONE;
 					eepromReadValues();
-					HAL_Delay(50);
+//					HAL_Delay(50);
 					if(hallIsEnd())
 					{
 						playTone(toneAlarmNE);

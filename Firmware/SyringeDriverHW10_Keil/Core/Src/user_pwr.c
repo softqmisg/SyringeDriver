@@ -186,6 +186,10 @@ void gotoStopMode(void)
   MX_USART3_UART_Init();
 	#endif
 	}	
+	rtc_flag=0;
+	rtc_flag2s=0;rtc_cnt2s=0;
+	rtc_flag5s=0;rtc_cnt5s=0;
+	sysTick_flag2s=0;	sysTick_cnt2s=0;	
 }
 /*-----------------------------------------------------*/
 void gotoStandbyMode(uint8_t mute)
