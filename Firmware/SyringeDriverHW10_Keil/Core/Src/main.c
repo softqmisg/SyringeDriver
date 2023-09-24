@@ -370,6 +370,7 @@ int main(void)
 				{
 					rtc_flag5s=0;
 					motorStop();
+					playTone(toneStopRun);
 					machineState=UpState;
 					printf("goto Upstate\r\n");
 					GoStandbyCnt=DELAY_GOSTANDBY;

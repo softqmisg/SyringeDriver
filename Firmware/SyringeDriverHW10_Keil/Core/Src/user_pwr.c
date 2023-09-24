@@ -28,7 +28,7 @@ void setAlarm(RTC_AlarmTypeDef *sAlarm,uint8_t delay)
 	sAlarm->AlarmTime.Minutes=sTime.Minutes;
 	sAlarm->AlarmTime.Hours=sTime.Hours;
 
-	sAlarm->AlarmTime.Seconds+=delay; //add ALARM every 1 Sec
+	sAlarm->AlarmTime.Seconds+=delay; //add ALARM every delay sec
 	if(sAlarm->AlarmTime.Seconds>59)
 	{
 		sAlarm->AlarmTime.Seconds-=60;
@@ -79,7 +79,7 @@ uint8_t rtcCheckTime(RTC_HandleTypeDef *hrtc,uint16_t targetsec)
 	HAL_RTC_WaitForSynchro(hrtc);
 	HAL_RTC_GetTime(hrtc,&sTime,RTC_FORMAT_BIN);
 	HAL_RTC_GetDate(hrtc,&sDate,RTC_FORMAT_BIN);
-	cursec=(uint16_t) sTime.Hours*3600+(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;
+	cursec=(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;//(uint16_t) sTime.Hours*3600+(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;
 	if(cursec>=targetsec)
 		return 1;
 	return 0;
@@ -117,7 +117,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t gpio_pin)
 /*-----------------------------------------------------*/
 void gotoStopMode(void)
 {
-  __IO uint32_t index = 0;
+__IO uint32_t index = 0;
   GPIO_InitTypeDef  sGpio;
 	RTC_TimeTypeDef sTime={0};
 	RTC_DateTypeDef sDate={.Year=0x0,.Date=0x01,.Month=RTC_MONTH_JANUARY,.WeekDay=RTC_WEEKDAY_MONDAY};
@@ -125,7 +125,7 @@ void gotoStopMode(void)
 	HAL_Delay(300);
 	muteTone();
 	printf("Bye!\r\n");
-		keypadRead();
+	keypadRead();
 	MX_GPIO_DeInit();
 	//----------------Init ExtI for wakeup----------------
   sGpio.Pin = KeySS_Pin;
@@ -144,22 +144,21 @@ void gotoStopMode(void)
 	HAL_NVIC_EnableIRQ(EXTI1_IRQn);//PORTA.1
 
 	
-		//-------------------stop Timers and ADC-----------------------------------
-	__HAL_RTC_ALARM_DISABLE_IT(&hrtc,RTC_IT_SEC);
-	HAL_TIM_Base_Stop_IT(&SEGMENT_TIMER); 			//tim4
-	HAL_TIM_Base_Stop_IT(&BUZZERPERIOD_TIMER); //tim3
-	HAL_TIM_Base_Stop(&BUZZERFREQ_TIMER);			//tim2
-	muteTone();
+		//-------------------stop Timers and ADC
+			muteTone();
 	motorStop();
+	__HAL_RTC_ALARM_DISABLE_IT(&hrtc,RTC_IT_SEC);
+	HAL_TIM_Base_Stop_IT(&SEGMENT_TIMER);
+	HAL_TIM_Base_Stop_IT(&BUZZERPERIOD_TIMER);
+	HAL_TIM_Base_Stop(&BUZZERFREQ_TIMER);
 	HAL_ADC_Stop_DMA(&hadc1);
-	HAL_ADC_MspDeInit(&hadc1);
 	
 	//-------------------set Alaram-----------------------------------
 	__HAL_RTC_ALARM_CLEAR_FLAG(&hrtc, RTC_FLAG_ALRAF);
 	HAL_NVIC_ClearPendingIRQ(RTC_IRQn);
 	HAL_NVIC_ClearPendingIRQ(RTC_Alarm_IRQn);
 	RTC_AlarmTypeDef  sAlarm;
-	setAlarm(&sAlarm,delayAlarwakups[EEValue_TYPEINDEX]); //every 2S
+	setAlarm(&sAlarm,delayAlarwakups[EEValue_TYPEINDEX]); //every 3/2s
 	HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm,RTC_FORMAT_BIN);
 	printf("\n\r");
 	//---------------------------goto stop--------------------
