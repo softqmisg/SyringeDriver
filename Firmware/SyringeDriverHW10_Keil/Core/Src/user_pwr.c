@@ -65,6 +65,10 @@ __STATIC_INLINE void SYSCLKConfig_FromSTOP(void)
   while(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI) 
   {
   };
+	
+	LL_RCC_SetADCClockSource(LL_RCC_ADC_CLKSRC_PCLK2_DIV_6);
+
+
 }
 /*-----------------------------------------------------*/
 uint8_t rtcCheckTime(RTC_HandleTypeDef *hrtc,uint16_t targetsec)
@@ -149,6 +153,7 @@ void gotoStopMode(void)
 	motorStop();
 	HAL_ADC_Stop_DMA(&hadc1);
 	HAL_ADC_MspDeInit(&hadc1);
+	
 	//-------------------set Alaram-----------------------------------
 	__HAL_RTC_ALARM_CLEAR_FLAG(&hrtc, RTC_FLAG_ALRAF);
 	HAL_NVIC_ClearPendingIRQ(RTC_IRQn);

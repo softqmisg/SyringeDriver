@@ -3,7 +3,7 @@
 <title>Static Call Graph - [SyringeDriverHW10_Keil\SyringeDriverHW10_Keil.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image SyringeDriverHW10_Keil\SyringeDriverHW10_Keil.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Sat Sep 23 16:25:38 2023
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Sat Sep 23 17:21:43 2023
 <BR><P>
 <H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1156,7 +1156,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_MspDeInit
 </UL>
 
-<P><STRONG><a name="[b4]"></a>HAL_GPIO_EXTI_Callback</STRONG> (Thumb, 108 bytes, Stack size 8 bytes, user_pwr.o(.text.HAL_GPIO_EXTI_Callback))
+<P><STRONG><a name="[b4]"></a>HAL_GPIO_EXTI_Callback</STRONG> (Thumb, 130 bytes, Stack size 8 bytes, user_pwr.o(.text.HAL_GPIO_EXTI_Callback))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = HAL_GPIO_EXTI_Callback
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PWR_DisableSleepOnExit
@@ -1382,8 +1382,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_IRQHandler
 </UL>
 
-<P><STRONG><a name="[c5]"></a>HAL_RTC_AlarmAEventCallback</STRONG> (Thumb, 236 bytes, Stack size 32 bytes, user_pwr.o(.text.HAL_RTC_AlarmAEventCallback))
-<BR><BR>[Stack]<UL><LI>Max Depth = 116<LI>Call Chain = HAL_RTC_AlarmAEventCallback &rArr; HAL_RTC_GetDate &rArr; HAL_RTC_GetTime &rArr; RTC_DateUpdate
+<P><STRONG><a name="[c5]"></a>HAL_RTC_AlarmAEventCallback</STRONG> (Thumb, 262 bytes, Stack size 40 bytes, user_pwr.o(.text.HAL_RTC_AlarmAEventCallback))
+<BR><BR>[Stack]<UL><LI>Max Depth = 124<LI>Call Chain = HAL_RTC_AlarmAEventCallback &rArr; HAL_RTC_GetDate &rArr; HAL_RTC_GetTime &rArr; RTC_DateUpdate
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PWR_DisableSleepOnExit
 <LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ResumeTick
@@ -1395,7 +1395,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[c9]"></a>HAL_RTC_AlarmIRQHandler</STRONG> (Thumb, 58 bytes, Stack size 8 bytes, stm32f1xx_hal_rtc.o(.text.HAL_RTC_AlarmIRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 124<LI>Call Chain = HAL_RTC_AlarmIRQHandler &rArr; HAL_RTC_AlarmAEventCallback &rArr; HAL_RTC_GetDate &rArr; HAL_RTC_GetTime &rArr; RTC_DateUpdate
+<BR><BR>[Stack]<UL><LI>Max Depth = 132<LI>Call Chain = HAL_RTC_AlarmIRQHandler &rArr; HAL_RTC_AlarmAEventCallback &rArr; HAL_RTC_GetDate &rArr; HAL_RTC_GetTime &rArr; RTC_DateUpdate
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_AlarmAEventCallback
 </UL>
@@ -1867,7 +1867,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[33]"></a>RTC_Alarm_IRQHandler</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32f1xx_it.o(.text.RTC_Alarm_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 124<LI>Call Chain = RTC_Alarm_IRQHandler &rArr; HAL_RTC_AlarmIRQHandler &rArr; HAL_RTC_AlarmAEventCallback &rArr; HAL_RTC_GetDate &rArr; HAL_RTC_GetTime &rArr; RTC_DateUpdate
+<BR><BR>[Stack]<UL><LI>Max Depth = 132<LI>Call Chain = RTC_Alarm_IRQHandler &rArr; HAL_RTC_AlarmIRQHandler &rArr; HAL_RTC_AlarmAEventCallback &rArr; HAL_RTC_GetDate &rArr; HAL_RTC_GetTime &rArr; RTC_DateUpdate
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_AlarmIRQHandler
 </UL>
