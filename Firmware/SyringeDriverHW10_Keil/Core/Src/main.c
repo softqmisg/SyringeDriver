@@ -192,6 +192,7 @@ int main(void)
 	RTC_DateTypeDef sDate={.Year=0x0,.Date=0x01,.Month=RTC_MONTH_JANUARY,.WeekDay=RTC_WEEKDAY_MONDAY};
 	uint8_t first_presstype=1;
 	uint8_t first_presstime=1;
+	uint8_t ne_alarm_cnt=0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -495,13 +496,21 @@ int main(void)
 //					HAL_Delay(50);
 					if(hallIsEnd())
 					{
-						playTone(toneAlarmNE);
-						setLED(LedAlarm,1);
-						rtc_flag=0;
-						while(!rtc_flag);
-						setLED(LedAlarm,0);
-						systemError=ERR_NE;
-						printf("Error!Near End of path\r\n");
+						if(ne_alarm_cnt<MAX_NE_ALARM_CNT)
+						{
+							ne_alarm_cnt++;
+							playTone(toneAlarmNE);
+							setLED(LedAlarm,1);
+							rtc_flag=0;
+							while(!rtc_flag);
+							setLED(LedAlarm,0);
+							systemError=ERR_NE;
+							printf("Error!Near End of path\r\n");
+						}
+					}
+					else
+					{
+						ne_alarm_cnt=0;
 					}
 					setLED(LedSS,1);
 					prevSwitchFB=mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin);

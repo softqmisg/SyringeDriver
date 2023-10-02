@@ -15,6 +15,8 @@
 #define MAX_TIMEINDEX	10
 #define MAX_TYPEINDEX	2
 
+#define MAX_NE_ALARM_CNT	3 //maximum nearend alarm counter
+
 extern uint16_t syringeTypes[];
 extern uint16_t syringeTimes[];
 extern uint8_t syringWakeups[][2];
