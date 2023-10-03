@@ -48,6 +48,6 @@ uint8_t syringWakeups[][2]={{45,45}, 	//6
 														{168,168},//22
 														{183,183},//24
 														};
-uint8_t delayAlarwakups[]={7,3};
+uint8_t delayAlarwakups[]={3,3};
 char *systemErrorMsg[]={"  ","NE","E5","dU"};
 uint8_t systemError=0;
