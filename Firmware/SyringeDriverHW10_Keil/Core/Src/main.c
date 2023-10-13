@@ -510,14 +510,17 @@ int main(void)
 					HAL_Delay(50);
 					if(hallIsEnd())
 					{
-						NE_AlarmCnt++;
-						playTone(toneAlarmNE);
-						setLED(LedAlarm,1);
-						rtc_flag=0;
-						while(!rtc_flag);
-						setLED(LedAlarm,0);
-						systemError=ERR_NE;
-						printf("Error!Near End of path\r\n");
+						if(NE_AlarmCnt<MAX_NE_ALARM_CNT)
+						{
+							NE_AlarmCnt++;
+							playTone(toneAlarmNE);
+							setLED(LedAlarm,1);
+							rtc_flag=0;
+							while(!rtc_flag);
+							setLED(LedAlarm,0);
+							systemError=ERR_NE;
+							printf("Error!Near End of path\r\n");
+						}
 					}
 					else
 					{
@@ -598,7 +601,6 @@ int main(void)
 								rtc_flag=0;
 								while(!rtc_flag);
 								setLED(LedAlarm,0);
-								NE_AlarmCnt=0;
 								systemError=ERR_NONE;
 							}
 						}
@@ -620,7 +622,6 @@ int main(void)
 								rtc_flag=0;
 								while(!rtc_flag);
 								setLED(LedAlarm,0);
-								ES_AlarmCnt=0;
 								systemError=ERR_NONE;
 							}
 						}
