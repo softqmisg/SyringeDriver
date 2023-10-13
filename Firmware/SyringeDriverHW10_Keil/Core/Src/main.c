@@ -144,8 +144,12 @@ void checkingSystem(void)
 	setLED(LedAlarm,1);
 	setLED(LedSS,1);
 	printDPSegs(" .");
-	HAL_Delay(3000);
+	HAL_Delay(100);
+	setLED(LedBat,0);
+	setLED(LedAlarm,0);
+	setLED(LedSS,0);
 	clearSegs();
+	playTone(toneBeep);
 	for(uint8_t i=0;i<9;i++)
 	{
 		sprintf(msg,"%d%d",i,i);
@@ -157,10 +161,10 @@ void checkingSystem(void)
 	HAL_Delay(200);
 	if(adcGetValue(adcBATVOLT)<ULTRALOWVOLT_TH)
 	{
-		playTone(toneAlarm);
-		printSegs("UL",1);
-		HAL_Delay(2000);
-		gotoStandbyMode(0);
+//		playTone(toneAlarm);
+//		printSegs("UL",1);
+//		HAL_Delay(2000);
+//		gotoStandbyMode(0);
 	}
 	else
 	{
@@ -192,7 +196,9 @@ int main(void)
 	RTC_DateTypeDef sDate={.Year=0x0,.Date=0x01,.Month=RTC_MONTH_JANUARY,.WeekDay=RTC_WEEKDAY_MONDAY};
 	uint8_t first_presstype=1;
 	uint8_t first_presstime=1;
-	uint8_t ne_alarm_cnt=0;
+	uint8_t NE_AlarmCnt=0;
+	uint8_t ES_AlarmCnt=0;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -266,14 +272,18 @@ int main(void)
 			adcGetRaw(adcBATVOLT);
 			if(adcGetValue(adcBATVOLT)<LOWBATVOLT_TH)
 			{
-				setLED(LedBat,1);
 				playTone(toneAlarm);
+				systemError=ERR_EU;
 				printSegs("EU",1);
-				HAL_Delay(5000);
+				setLED(LedBat,1);rtc_flag=0;while(!rtc_flag); 
+				setLED(LedBat,0);rtc_flag=0;while(!rtc_flag); 
+				setLED(LedBat,1);rtc_flag=0;while(!rtc_flag); 
 				machineState=StandbyState;
 			}
 			else
+			{
 				setLED(LedBat,0);
+			}
 		}
     /* USER CODE END WHILE */
 
@@ -299,10 +309,10 @@ int main(void)
 					playTone(tonePowerWake);
 					if(adcGetValue(adcBATVOLT)<ULTRALOWVOLT_TH)
 					{
-						playTone(toneAlarm);
-						printSegs("UL",1);
-						HAL_Delay(2000);
-						gotoStandbyMode(0);
+//						playTone(toneAlarm);
+//						printSegs("UL",1);
+//						HAL_Delay(2000);
+//						gotoStandbyMode(0);
 					}
 					else
 					{
@@ -371,7 +381,7 @@ int main(void)
 				{
 					rtc_flag5s=0;
 					motorStop();
-					playTone(toneStopRun);
+					playTone(toneAlarm);
 					machineState=UpState;
 					printf("goto Upstate\r\n");
 					GoStandbyCnt=DELAY_GOSTANDBY;
@@ -470,12 +480,17 @@ int main(void)
 					printf("===========================\r\n");					
 					printf("goto RunState\r\n");
 					HAL_RTC_SetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
-					HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);					
+					HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);
+					HAL_RTC_WaitForSynchro(&hrtc);
+					HAL_RTC_GetTime(&hrtc,&stampTime,RTC_FORMAT_BIN);
+					HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);	
 					hallON();
 					rtc_flag2s=0;rtc_cnt2s=0;
 					while(!rtc_flag2s);	
 					rtc_flag2s=0;	
 					motorErrNum=0;
+					NE_AlarmCnt=0;
+					ES_AlarmCnt=0;
 				}
 				if(isKeyHold(KeyPower))
 				{
@@ -491,26 +506,23 @@ int main(void)
 			case RunState:
 				if(runState==RunOnState)
 				{
-					systemError=ERR_NONE;
 					eepromReadValues();
-//					HAL_Delay(50);
+					HAL_Delay(50);
 					if(hallIsEnd())
 					{
-						if(ne_alarm_cnt<MAX_NE_ALARM_CNT)
-						{
-							ne_alarm_cnt++;
-							playTone(toneAlarmNE);
-							setLED(LedAlarm,1);
-							rtc_flag=0;
-							while(!rtc_flag);
-							setLED(LedAlarm,0);
-							systemError=ERR_NE;
-							printf("Error!Near End of path\r\n");
-						}
+						NE_AlarmCnt++;
+						playTone(toneAlarmNE);
+						setLED(LedAlarm,1);
+						rtc_flag=0;
+						while(!rtc_flag);
+						setLED(LedAlarm,0);
+						systemError=ERR_NE;
+						printf("Error!Near End of path\r\n");
 					}
 					else
 					{
-						ne_alarm_cnt=0;
+						NE_AlarmCnt=0;
+						if(systemError==ERR_NE) systemError=ERR_NONE;
 					}
 					setLED(LedSS,1);
 					prevSwitchFB=mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin);
@@ -519,13 +531,6 @@ int main(void)
 					if(motorDuty>100.0)
 					{
 						motorDuty=100.0;
-//						if(systemError!=ERR_NONE)
-//							playTone(toneAlarmNE);
-//						setLED(LedAlarm,1);
-//						rtc_flag=0;
-//						while(!rtc_flag);
-//						setLED(LedAlarm,0);
-//						systemError=ERR_DU;
 						printf("Error!Duty cycle more than %%100\r\n");
 					}
 					clearSegs();
@@ -539,6 +544,7 @@ int main(void)
 						motorErrNum=0;
 						runState=RunOffState;
 						gotoStopMode();
+						if(systemError==ERR_ES)	systemError=ERR_NONE;
 					}
 					else
 					{
@@ -547,8 +553,9 @@ int main(void)
 						rtc_flag=0;
 						while(!rtc_flag);
 						setLED(LedAlarm,0);
-						systemError=ERR_E5;
+						systemError=ERR_ES;
 						motorErrNum++;
+						ES_AlarmCnt++;
 						if(motorErrNum>=MAX_MotorErrNum)
 						{
 							setLED(LedAlarm,1);
@@ -565,7 +572,7 @@ int main(void)
 				}
 				else
 				{
-					if(awu_flag)
+					if(awu_flag) //every 3S
 					{
 						awu_flag=0;
 						//printf("AWU timeout led flag!\r\n");
@@ -573,6 +580,50 @@ int main(void)
 						rtc_flag=0;
 						while(!rtc_flag);
 						setLED(LedSS,0);
+						if(systemError==ERR_NE)
+						{
+							NE_AlarmCnt++;
+							if((NE_AlarmCnt==MAX_NE_ALARM_CNT)) //after
+							{
+								playTone(toneAlarmNE);
+								setLED(LedAlarm,1);
+								rtc_flag=0;
+								while(!rtc_flag);
+								setLED(LedAlarm,0);
+							}
+							else if(NE_AlarmCnt==2*MAX_NE_ALARM_CNT)
+							{
+								playTone(toneAlarmNE);
+								setLED(LedAlarm,1);
+								rtc_flag=0;
+								while(!rtc_flag);
+								setLED(LedAlarm,0);
+								NE_AlarmCnt=0;
+								systemError=ERR_NONE;
+							}
+						}
+						if(systemError==ERR_ES)
+						{
+							ES_AlarmCnt++;
+							if(ES_AlarmCnt==MAX_ES_ALARM_CNT) //after
+							{
+								playTone(toneAlarm);
+								setLED(LedAlarm,1);
+								rtc_flag=0;
+								while(!rtc_flag);
+								setLED(LedAlarm,0);
+							}
+							else if(ES_AlarmCnt==2*MAX_ES_ALARM_CNT)
+							{
+								playTone(toneAlarm);
+								setLED(LedAlarm,1);
+								rtc_flag=0;
+								while(!rtc_flag);
+								setLED(LedAlarm,0);
+								ES_AlarmCnt=0;
+								systemError=ERR_NONE;
+							}
+						}
 						gotoStopMode();
 					}
 					if(isKeyPress(KeyPower))

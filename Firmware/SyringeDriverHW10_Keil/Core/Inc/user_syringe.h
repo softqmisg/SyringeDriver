@@ -5,9 +5,9 @@
 //#define STOPWAKEUP_TICK	2 //s
 
 #define ERR_NONE	0
-#define ERR_NE		1
-#define ERR_E5		2
-#define ERR_DU		3
+#define ERR_NE		1  //
+#define ERR_ES		2
+#define ERR_EU		3
 
 #define ULTRALOWVOLT_TH		6850 //mv noload of bat=6850+150=7000
 #define LOWBATVOLT_TH			7150 //ms noload of bat=7150+150=7300
@@ -15,7 +15,8 @@
 #define MAX_TIMEINDEX	10
 #define MAX_TYPEINDEX	2
 
-#define MAX_NE_ALARM_CNT	3 //maximum nearend alarm counter
+#define MAX_NE_ALARM_CNT	4 //maximum NE alarm counter
+#define MAX_ES_ALARM_CNT	4 //maximum ES alarm counter
 
 extern uint16_t syringeTypes[];
 extern uint16_t syringeTimes[];

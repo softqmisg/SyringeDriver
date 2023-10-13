@@ -14,19 +14,15 @@
 #include "user_sevensegment.h"
 #include "usart.h"
 #include <time.h>
+RTC_TimeTypeDef stampTime;
 /*-----------------------------------------------------*/
-void setAlarm(RTC_AlarmTypeDef *sAlarm,uint8_t delay)
+void setAlarm(RTC_AlarmTypeDef *sAlarm,RTC_TimeTypeDef stamp, uint8_t delay)
 {
-	RTC_TimeTypeDef sTime;
-	RTC_DateTypeDef sDate;
-	//HAL_RTC_WaitForSynchro(&hrtc);
-	HAL_RTC_GetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
-	HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);
-
+	
 	sAlarm->Alarm=RTC_ALARM_A;
-	sAlarm->AlarmTime.Seconds=sTime.Seconds;
-	sAlarm->AlarmTime.Minutes=sTime.Minutes;
-	sAlarm->AlarmTime.Hours=sTime.Hours;
+	sAlarm->AlarmTime.Seconds=stamp.Seconds;
+	sAlarm->AlarmTime.Minutes=stamp.Minutes;
+	sAlarm->AlarmTime.Hours=stamp.Hours;
 
 	sAlarm->AlarmTime.Seconds+=delay; //add ALARM every delay sec
 	if(sAlarm->AlarmTime.Seconds>59)
@@ -79,7 +75,7 @@ uint8_t rtcCheckTime(RTC_HandleTypeDef *hrtc,uint16_t targetsec)
 	HAL_RTC_WaitForSynchro(hrtc);
 	HAL_RTC_GetTime(hrtc,&sTime,RTC_FORMAT_BIN);
 	HAL_RTC_GetDate(hrtc,&sDate,RTC_FORMAT_BIN);
-	cursec=(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;//(uint16_t) sTime.Hours*3600+(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;
+	cursec=(uint16_t) sTime.Hours*3600+(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;//(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;//
 	if(cursec>=targetsec)
 		return 1;
 	return 0;
@@ -144,8 +140,8 @@ __IO uint32_t index = 0;
 	HAL_NVIC_EnableIRQ(EXTI1_IRQn);//PORTA.1
 
 	
-		//-------------------stop Timers and ADC
-			muteTone();
+	//-------------------stop Timers and ADC
+	muteTone();
 	motorStop();
 	__HAL_RTC_ALARM_DISABLE_IT(&hrtc,RTC_IT_SEC);
 	HAL_TIM_Base_Stop_IT(&SEGMENT_TIMER);
@@ -158,7 +154,7 @@ __IO uint32_t index = 0;
 	HAL_NVIC_ClearPendingIRQ(RTC_IRQn);
 	HAL_NVIC_ClearPendingIRQ(RTC_Alarm_IRQn);
 	RTC_AlarmTypeDef  sAlarm;
-	setAlarm(&sAlarm,delayAlarwakups[EEValue_TYPEINDEX]); //every 3/2s
+	setAlarm(&sAlarm,stampTime,delayAlarwakups[EEValue_TYPEINDEX]); //every 3/2s
 	HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm,RTC_FORMAT_BIN);
 	printf("\n\r");
 	//---------------------------goto stop--------------------
@@ -194,6 +190,10 @@ __IO uint32_t index = 0;
 	rtc_flag2s=0;rtc_cnt2s=0;
 	rtc_flag5s=0;rtc_cnt5s=0;
 	sysTick_flag2s=0;	sysTick_cnt2s=0;	
+	
+	HAL_RTC_WaitForSynchro(&hrtc);
+	HAL_RTC_GetTime(&hrtc,&stampTime,RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);	
 }
 /*-----------------------------------------------------*/
 void gotoStandbyMode(uint8_t mute)
