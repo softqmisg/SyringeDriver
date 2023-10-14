@@ -18,6 +18,12 @@ RTC_TimeTypeDef stampTime;
 /*-----------------------------------------------------*/
 void setAlarm(RTC_AlarmTypeDef *sAlarm,RTC_TimeTypeDef stamp, uint8_t delay)
 {
+		RTC_TimeTypeDef sTime;
+		HAL_RTC_GetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
+	uint16_t cursec=(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;
+	uint16_t nextsec=(uint16_t) stamp.Minutes*60+(uint16_t) stamp.Seconds+(uint16_t)delay;
+	if(nextsec<cursec)
+		delay=delay*2;
 	
 	sAlarm->Alarm=RTC_ALARM_A;
 	sAlarm->AlarmTime.Seconds=stamp.Seconds;
@@ -82,30 +88,32 @@ uint8_t rtcCheckTime(RTC_HandleTypeDef *hrtc,uint16_t targetsec)
 }
 /*-----------------------------------------------------*/
 __IO uint8_t awu_flag=0;
-__IO uint8_t awu_blink_cnt=0;
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	RTC_AlarmTypeDef sAlarm;
 	SYSCLKConfig_FromSTOP();
-	HAL_ResumeTick();	
-	awu_blink_cnt=0;
+	HAL_ResumeTick();
+	keyw_flag	=0;
 	awu_flag=1;
 	runState=RunOffState;
 	if(rtcCheckTime(hrtc,syringWakeups[EEValue_TIMEINDEX][EEValue_TYPEINDEX]))
 	{
-		awu_flag=1;
+//		awu_flag=1;
 		runState=RunOnState;
 	}
 		HAL_PWR_DisableSleepOnExit();
 
 }
 /*-----------------------------------------------------*/
+__IO uint8_t keyw_flag=0;
 void HAL_GPIO_EXTI_Callback(uint16_t gpio_pin)
 {
 	if(gpio_pin==KeySS_Pin || gpio_pin ==KeyPower_Pin)
 	{
 		SYSCLKConfig_FromSTOP();
 		HAL_ResumeTick();	
+		awu_flag=0;
+		keyw_flag=1;
 		HAL_PWR_DisableSleepOnExit();
 	}
 }
@@ -139,24 +147,23 @@ __IO uint32_t index = 0;
 	HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(EXTI1_IRQn);//PORTA.1
 
-	
 	//-------------------stop Timers and ADC
 	muteTone();
 	motorStop();
-	__HAL_RTC_ALARM_DISABLE_IT(&hrtc,RTC_IT_SEC);
 	HAL_TIM_Base_Stop_IT(&SEGMENT_TIMER);
 	HAL_TIM_Base_Stop_IT(&BUZZERPERIOD_TIMER);
 	HAL_TIM_Base_Stop(&BUZZERFREQ_TIMER);
 	HAL_ADC_Stop_DMA(&hadc1);
 	
 	//-------------------set Alaram-----------------------------------
-	__HAL_RTC_ALARM_CLEAR_FLAG(&hrtc, RTC_FLAG_ALRAF);
-	HAL_NVIC_ClearPendingIRQ(RTC_IRQn);
-	HAL_NVIC_ClearPendingIRQ(RTC_Alarm_IRQn);
 	RTC_AlarmTypeDef  sAlarm;
-	setAlarm(&sAlarm,stampTime,delayAlarwakups[EEValue_TYPEINDEX]); //every 3/2s
-	HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm,RTC_FORMAT_BIN);
-	printf("\n\r");
+	__HAL_RTC_ALARM_CLEAR_FLAG(&hrtc, RTC_FLAG_ALRAF);
+		HAL_NVIC_ClearPendingIRQ(RTC_IRQn);
+		HAL_NVIC_ClearPendingIRQ(RTC_Alarm_IRQn);
+		__HAL_RTC_ALARM_DISABLE_IT(&hrtc,RTC_IT_SEC);
+		setAlarm(&sAlarm,stampTime,delayAlarwakups[EEValue_TYPEINDEX]); //every 3/2s
+		HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm,RTC_FORMAT_BIN);
+		printf("\n\r");
 	//---------------------------goto stop--------------------
 	HAL_SuspendTick();
 	HAL_PWR_EnableSleepOnExit();
@@ -166,38 +173,35 @@ __IO uint32_t index = 0;
 	MX_GPIO_Init();		
 	HAL_ADC_MspInit(&hadc1);
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcRawValue,4);	
-
 	HAL_TIM_MspPostInit(&BUZZERFREQ_TIMER);
 	keypadRead();
 	initSegs();
-		HAL_RTC_WaitForSynchro(&hrtc);
-	__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
+	HAL_RTC_WaitForSynchro(&hrtc);
 	printf("Hi!\r\n");
-	if(runState==RunOnState)
-	{
-		awu_flag=0;
-		printf("===========================\r\n");
-		printf("AWU timeout Run On state!\r\n");
-		HAL_RTC_SetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
-		HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);
-		HAL_RTC_GetTime(&hrtc,&stampTime,RTC_FORMAT_BIN);
-		HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);			
-		hallON();
-		HAL_TIM_MspPostInit(&htim1);
-	#if __DEBUG__
-  MX_USART3_UART_Init();
-	#endif
-	}	
+	__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
 	if(awu_flag)
 	{
+		if(runState==RunOnState)
+		{
+			awu_flag=0;
+			printf("===========================\r\n");
+			printf("AWU timeout Run On state!\r\n");
+			HAL_RTC_SetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
+			HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);			
+			hallON();
+			HAL_TIM_MspPostInit(&htim1);
+			#if __DEBUG__
+			MX_USART3_UART_Init();
+			#endif
+		}
 		HAL_RTC_GetTime(&hrtc,&stampTime,RTC_FORMAT_BIN);
-		HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);			
+		HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);					
 	}
 	rtc_flag=0;
 	rtc_flag2s=0;rtc_cnt2s=0;
 	rtc_flag5s=0;rtc_cnt5s=0;
 	sysTick_flag2s=0;	sysTick_cnt2s=0;	
-	
+	sysTick_flag1s=0;	sysTick_cnt1s=0;	
 
 }
 /*-----------------------------------------------------*/

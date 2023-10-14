@@ -74,8 +74,17 @@ rState_t runState=RunNoneState;
 // ----------------------Systick callback-----------------------------------------
 __IO uint16_t sysTick_cnt2s=0;
 __IO uint8_t sysTick_flag2s=0;
+__IO uint16_t sysTick_cnt1s=0;
+__IO uint8_t sysTick_flag1s=0;
 void HAL_SYSTICK_Callback(void)
 {
+	sysTick_cnt1s++;
+	if(sysTick_cnt1s>=1000)
+	{
+		sysTick_cnt1s=0;
+		sysTick_flag1s=1;
+	}
+
 	sysTick_cnt2s++;
 	if(sysTick_cnt2s>=2000)
 	{
@@ -144,7 +153,7 @@ void checkingSystem(void)
 	setLED(LedAlarm,1);
 	setLED(LedSS,1);
 	printDPSegs(" .");
-	HAL_Delay(100);
+	HAL_Delay(500);
 	setLED(LedBat,0);
 	setLED(LedAlarm,0);
 	setLED(LedSS,0);
@@ -481,8 +490,6 @@ int main(void)
 					printf("goto RunState\r\n");
 					HAL_RTC_SetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
 					HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);
-					HAL_RTC_GetTime(&hrtc,&stampTime,RTC_FORMAT_BIN);
-					HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);	
 					hallON();
 					rtc_flag2s=0;rtc_cnt2s=0;
 					while(!rtc_flag2s);	
@@ -490,6 +497,8 @@ int main(void)
 					motorErrNum=0;
 					NE_AlarmCnt=0;
 					ES_AlarmCnt=0;
+					awu_flag=0;
+					keyw_flag=0;
 				}
 				if(isKeyHold(KeyPower))
 				{
@@ -512,12 +521,13 @@ int main(void)
 						if(NE_AlarmCnt<MAX_NE_ALARM_CNT)
 						{
 							NE_AlarmCnt++;
-							playTone(toneAlarmNE);
-							setLED(LedAlarm,1);
-							rtc_flag=0;
-							while(!rtc_flag);
-							setLED(LedAlarm,0);
 							systemError=ERR_NE;
+							playTone(toneAlarmNE);
+							printSegs(systemErrorMsg[systemError],0);						
+							setLED(LedAlarm,1);
+							sysTick_flag1s=0;sysTick_cnt1s=0;
+							while(!sysTick_flag1s);
+							setLED(LedAlarm,0);
 							printf("Error!Near End of path\r\n");
 						}
 					}
@@ -536,6 +546,8 @@ int main(void)
 						printf("Error!Duty cycle more than %%100\r\n");
 					}
 					clearSegs();
+					HAL_RTC_GetTime(&hrtc,&stampTime,RTC_FORMAT_BIN);
+					HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);	
 					motorStart(motorDuty);
 					sysTick_flag2s=0;sysTick_cnt2s=0;
 					while(!sysTick_flag2s && prevSwitchFB==mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin));
@@ -550,12 +562,13 @@ int main(void)
 					}
 					else
 					{
-						playTone(toneAlarm);
-						setLED(LedAlarm,1);
-						rtc_flag=0;
-						while(!rtc_flag);
-						setLED(LedAlarm,0);
 						systemError=ERR_ES;
+						playTone(toneAlarm);
+						printSegs(systemErrorMsg[systemError],0);						
+						setLED(LedAlarm,1);
+						sysTick_flag1s=0;sysTick_cnt1s=0;
+						while(!sysTick_flag1s);
+						setLED(LedAlarm,0);
 						motorErrNum++;
 						ES_AlarmCnt++;
 						if(motorErrNum>=MAX_MotorErrNum)
@@ -579,8 +592,8 @@ int main(void)
 						awu_flag=0;
 						//printf("AWU timeout led flag!\r\n");
 						setLED(LedSS,1);
-						rtc_flag=0;
-						while(!rtc_flag);
+						sysTick_flag1s=0;sysTick_cnt1s=0;
+						while(!sysTick_flag1s);
 						setLED(LedSS,0);
 						if(systemError==ERR_NE)
 						{
@@ -588,17 +601,19 @@ int main(void)
 							if((NE_AlarmCnt==MAX_NE_ALARM_CNT)) //after
 							{
 								playTone(toneAlarmNE);
+								printSegs(systemErrorMsg[systemError],0);
 								setLED(LedAlarm,1);
-								rtc_flag=0;
-								while(!rtc_flag);
+								sysTick_flag1s=0;sysTick_cnt1s=0;
+								while(!sysTick_flag1s);
 								setLED(LedAlarm,0);
 							}
 							else if(NE_AlarmCnt==2*MAX_NE_ALARM_CNT)
 							{
 								playTone(toneAlarmNE);
+								printSegs(systemErrorMsg[systemError],0);
 								setLED(LedAlarm,1);
-								rtc_flag=0;
-								while(!rtc_flag);
+								sysTick_flag1s=0;sysTick_cnt1s=0;
+								while(!sysTick_flag1s);
 								setLED(LedAlarm,0);
 								systemError=ERR_NONE;
 							}
@@ -609,17 +624,19 @@ int main(void)
 							if(ES_AlarmCnt==MAX_ES_ALARM_CNT) //after
 							{
 								playTone(toneAlarm);
+								printSegs(systemErrorMsg[systemError],0);
 								setLED(LedAlarm,1);
-								rtc_flag=0;
-								while(!rtc_flag);
+								sysTick_flag1s=0;sysTick_cnt1s=0;
+								while(!sysTick_flag1s);
 								setLED(LedAlarm,0);
 							}
 							else if(ES_AlarmCnt==2*MAX_ES_ALARM_CNT)
 							{
 								playTone(toneAlarm);
+								printSegs(systemErrorMsg[systemError],0);
 								setLED(LedAlarm,1);
-								rtc_flag=0;
-								while(!rtc_flag);
+								sysTick_flag1s=0;sysTick_cnt1s=0;
+								while(!sysTick_flag1s);
 								setLED(LedAlarm,0);
 								systemError=ERR_NONE;
 							}
@@ -628,6 +645,7 @@ int main(void)
 					}
 					if(isKeyPress(KeyPower))
 					{
+						keyw_flag=0;
 						playTone(toneBeep);
 						if(systemError!=ERR_NONE)
 						{
@@ -638,14 +656,16 @@ int main(void)
 							sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
 							printSegs(msg,0);
 						}
-						rtc_flag2s=0;rtc_cnt2s=0;
-						while(!rtc_flag2s);
+						sysTick_flag2s=0;sysTick_cnt2s=0;
+						while(!sysTick_flag2s);
 						clearSegs();
 						runState=RunOffState;
 						gotoStopMode();
 					}
 					if(isKeyHold(KeySS))
 					{
+						__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
+						keyw_flag=0;
 						playTone(toneBeep);
 						playTone(toneStopRun);
 						HAL_TIM_MspPostInit(&htim1);						
