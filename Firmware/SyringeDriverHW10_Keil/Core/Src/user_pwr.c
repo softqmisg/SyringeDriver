@@ -170,6 +170,7 @@ __IO uint32_t index = 0;
 	HAL_TIM_MspPostInit(&BUZZERFREQ_TIMER);
 	keypadRead();
 	initSegs();
+		HAL_RTC_WaitForSynchro(&hrtc);
 	__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
 	printf("Hi!\r\n");
 	if(runState==RunOnState)
@@ -177,23 +178,27 @@ __IO uint32_t index = 0;
 		awu_flag=0;
 		printf("===========================\r\n");
 		printf("AWU timeout Run On state!\r\n");
-		HAL_RTC_WaitForSynchro(&hrtc);
 		HAL_RTC_SetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
 		HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);
+		HAL_RTC_GetTime(&hrtc,&stampTime,RTC_FORMAT_BIN);
+		HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);			
 		hallON();
 		HAL_TIM_MspPostInit(&htim1);
 	#if __DEBUG__
   MX_USART3_UART_Init();
 	#endif
 	}	
+	if(awu_flag)
+	{
+		HAL_RTC_GetTime(&hrtc,&stampTime,RTC_FORMAT_BIN);
+		HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);			
+	}
 	rtc_flag=0;
 	rtc_flag2s=0;rtc_cnt2s=0;
 	rtc_flag5s=0;rtc_cnt5s=0;
 	sysTick_flag2s=0;	sysTick_cnt2s=0;	
 	
-	HAL_RTC_WaitForSynchro(&hrtc);
-	HAL_RTC_GetTime(&hrtc,&stampTime,RTC_FORMAT_BIN);
-	HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);	
+
 }
 /*-----------------------------------------------------*/
 void gotoStandbyMode(uint8_t mute)
