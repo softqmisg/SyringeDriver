@@ -119,6 +119,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t gpio_pin)
 }
 
 /*-----------------------------------------------------*/
+uint8_t activeAlarm=1;
 void gotoStopMode(void)
 {
 __IO uint32_t index = 0;
@@ -158,12 +159,15 @@ __IO uint32_t index = 0;
 	//-------------------set Alaram-----------------------------------
 	RTC_AlarmTypeDef  sAlarm;
 	__HAL_RTC_ALARM_CLEAR_FLAG(&hrtc, RTC_FLAG_ALRAF);
-		HAL_NVIC_ClearPendingIRQ(RTC_IRQn);
-		HAL_NVIC_ClearPendingIRQ(RTC_Alarm_IRQn);
-		__HAL_RTC_ALARM_DISABLE_IT(&hrtc,RTC_IT_SEC);
+	HAL_NVIC_ClearPendingIRQ(RTC_IRQn);
+	HAL_NVIC_ClearPendingIRQ(RTC_Alarm_IRQn);
+	__HAL_RTC_ALARM_DISABLE_IT(&hrtc,RTC_IT_SEC);
+	if(activeAlarm)
+	{
 		setAlarm(&sAlarm,stampTime,delayAlarwakups[EEValue_TYPEINDEX]); //every 3/2s
 		HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm,RTC_FORMAT_BIN);
-		printf("\n\r");
+	}
+	printf("\n\r");
 	//---------------------------goto stop--------------------
 	HAL_SuspendTick();
 	HAL_PWR_EnableSleepOnExit();

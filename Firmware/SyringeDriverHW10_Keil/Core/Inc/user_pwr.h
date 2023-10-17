@@ -4,8 +4,8 @@
 
 extern __IO uint8_t awu_flag;
 extern __IO uint8_t keyw_flag;
-
 extern RTC_TimeTypeDef stampTime;
+extern uint8_t activeAlarm;
 
 __STATIC_INLINE void SYSCLKConfig_FromSTOP(void);
 void gotoStopMode(void);

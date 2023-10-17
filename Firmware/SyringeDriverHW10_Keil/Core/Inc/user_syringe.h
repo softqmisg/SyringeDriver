@@ -15,6 +15,7 @@
 #define MAX_TIMEINDEX	10
 #define MAX_TYPEINDEX	2
 
+#define MAX_NE_ALARM_INDEX	2
 #define MAX_NE_ALARM_CNT	4 //maximum NE alarm counter
 #define MAX_ES_ALARM_CNT	4 //maximum ES alarm counter
 

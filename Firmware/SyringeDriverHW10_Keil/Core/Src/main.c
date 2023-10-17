@@ -206,8 +206,9 @@ int main(void)
 	uint8_t first_presstype=1;
 	uint8_t first_presstime=1;
 	uint8_t NE_AlarmCnt=0;
+	uint8_t NE_AlarmIndex=0;
 	uint8_t ES_AlarmCnt=0;
-
+	
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -496,6 +497,7 @@ int main(void)
 					rtc_flag2s=0;	
 					motorErrNum=0;
 					NE_AlarmCnt=0;
+					NE_AlarmIndex=0;
 					ES_AlarmCnt=0;
 					awu_flag=0;
 					keyw_flag=0;
@@ -518,9 +520,10 @@ int main(void)
 					HAL_Delay(50);
 					if(hallIsEnd())
 					{
-						if(NE_AlarmCnt<MAX_NE_ALARM_CNT)
+						if(NE_AlarmIndex<MAX_NE_ALARM_INDEX)
 						{
-							NE_AlarmCnt++;
+							NE_AlarmIndex++;
+							NE_AlarmCnt=0;
 							systemError=ERR_NE;
 							playTone(toneAlarmNE);
 							printSegs(systemErrorMsg[systemError],0);						
@@ -534,6 +537,7 @@ int main(void)
 					else
 					{
 						NE_AlarmCnt=0;
+						NE_AlarmIndex=0;
 						if(systemError==ERR_NE) systemError=ERR_NONE;
 					}
 					setLED(LedSS,1);
@@ -557,12 +561,11 @@ int main(void)
 					{
 						motorErrNum=0;
 						runState=RunOffState;
-						gotoStopMode();
+						activeAlarm=1;gotoStopMode();
 						if(systemError==ERR_ES)	systemError=ERR_NONE;
 					}
 					else
 					{
-						systemError=ERR_ES;
 						playTone(toneAlarm);
 						printSegs(systemErrorMsg[systemError],0);						
 						setLED(LedAlarm,1);
@@ -573,15 +576,26 @@ int main(void)
 						ES_AlarmCnt++;
 						if(motorErrNum>=MAX_MotorErrNum)
 						{
-							setLED(LedAlarm,1);
-							printf("error!exceed maximum motor error.\r\n");
-							machineState=StandbyState;
+							if(systemError==ERR_NE)
+							{
+								setLED(LedAlarm,1);
+								printf("error!exceed maximum motor error and NE active.\r\n");
+								machineState=StandbyState;
+							}
+							else
+							{
+								systemError=ERR_ES;
+								printf("error!exceed maximum motor error but NE not active.\r\n");
+								runState=RunOffState;
+								activeAlarm=0;gotoStopMode();
+							}
 						}
 						else
 						{
+							systemError=ERR_ES;
 							printf("error!motor err %d\r\n",motorErrNum);
 							runState=RunOffState;
-							gotoStopMode();							
+							activeAlarm=1;gotoStopMode();							
 						}
 					}
 				}
@@ -641,7 +655,7 @@ int main(void)
 								systemError=ERR_NONE;
 							}
 						}
-						gotoStopMode();
+						gotoStopMode(); //activeAlarm save its previous value
 					}
 					if(isKeyPress(KeyPower))
 					{
@@ -660,7 +674,7 @@ int main(void)
 						while(!sysTick_flag2s);
 						clearSegs();
 						runState=RunOffState;
-						gotoStopMode();
+						gotoStopMode();//activeAlarm save its previous value
 					}
 					if(isKeyHold(KeySS))
 					{
