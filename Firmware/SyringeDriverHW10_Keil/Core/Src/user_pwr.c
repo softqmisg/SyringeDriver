@@ -20,10 +20,13 @@ void setAlarm(RTC_AlarmTypeDef *sAlarm,RTC_TimeTypeDef stamp, uint8_t delay)
 {
 		RTC_TimeTypeDef sTime;
 		HAL_RTC_GetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
-	uint16_t cursec=(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;
-	uint16_t nextsec=(uint16_t) stamp.Minutes*60+(uint16_t) stamp.Seconds+(uint16_t)delay;
-	if(nextsec<cursec)
+	uint16_t cursec=(uint16_t) sTime.Hours*3600+(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;
+	uint16_t nextsec=(uint16_t) stamp.Hours*3600+(uint16_t) stamp.Minutes*60+(uint16_t) stamp.Seconds+(uint16_t)delay;
+	while(nextsec<cursec)
+	{
 		delay=delay*2;
+		nextsec=(uint16_t) stamp.Hours*3600+(uint16_t) stamp.Minutes*60+(uint16_t) stamp.Seconds+(uint16_t)delay;
+	}
 	
 	sAlarm->Alarm=RTC_ALARM_A;
 	sAlarm->AlarmTime.Seconds=stamp.Seconds;
@@ -164,7 +167,7 @@ __IO uint32_t index = 0;
 	__HAL_RTC_ALARM_DISABLE_IT(&hrtc,RTC_IT_SEC);
 	if(activeAlarm)
 	{
-		setAlarm(&sAlarm,stampTime,delayAlarwakups[EEValue_TYPEINDEX]); //every 3/2s
+		setAlarm(&sAlarm,stampTime,delayAlarwakups[EEValue_TYPEINDEX]); //every 3/3s
 		HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm,RTC_FORMAT_BIN);
 	}
 	printf("\n\r");

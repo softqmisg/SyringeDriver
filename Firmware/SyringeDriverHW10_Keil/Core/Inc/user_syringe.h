@@ -21,7 +21,7 @@
 
 extern uint16_t syringeTypes[];
 extern uint16_t syringeTimes[];
-extern uint8_t syringWakeups[][2];
+extern uint16_t syringWakeups[][2];
 extern uint8_t systemError;
 extern char *systemErrorMsg[];
 extern uint8_t delayAlarwakups[];

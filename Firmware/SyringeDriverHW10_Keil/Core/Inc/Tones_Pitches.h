@@ -262,4 +262,5 @@ extern uint16_t toneSave[];
 extern uint16_t toneEnterSetup[];
 extern uint16_t toneStartRun[];
 extern uint16_t toneStopRun[];
+extern uint16_t toneBolusEnd[];
 #endif

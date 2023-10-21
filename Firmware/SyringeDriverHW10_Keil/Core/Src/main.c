@@ -391,7 +391,7 @@ int main(void)
 				{
 					rtc_flag5s=0;
 					motorStop();
-					playTone(toneAlarm);
+					playTone(toneBolusEnd);
 					machineState=UpState;
 					printf("goto Upstate\r\n");
 					GoStandbyCnt=DELAY_GOSTANDBY;
