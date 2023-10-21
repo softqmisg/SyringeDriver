@@ -567,7 +567,7 @@ int main(void)
 					else
 					{
 						playTone(toneAlarm);
-						printSegs(systemErrorMsg[systemError],0);						
+						printSegs("E5",0);						
 						setLED(LedAlarm,1);
 						sysTick_flag1s=0;sysTick_cnt1s=0;
 						while(!sysTick_flag1s);

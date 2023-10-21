@@ -22,7 +22,7 @@ void setAlarm(RTC_AlarmTypeDef *sAlarm,RTC_TimeTypeDef stamp, uint8_t delay)
 		HAL_RTC_GetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
 	uint16_t cursec=(uint16_t) sTime.Hours*3600+(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;
 	uint16_t nextsec=(uint16_t) stamp.Hours*3600+(uint16_t) stamp.Minutes*60+(uint16_t) stamp.Seconds+(uint16_t)delay;
-	while(nextsec<cursec)
+	while((int16_t)(nextsec-cursec)<2)
 	{
 		delay=delay*2;
 		nextsec=(uint16_t) stamp.Hours*3600+(uint16_t) stamp.Minutes*60+(uint16_t) stamp.Seconds+(uint16_t)delay;
