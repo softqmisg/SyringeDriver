@@ -17,7 +17,7 @@
 #define EE_ADD_TYPEINDEX	18
 
 
-#define DEFAULT_PWM				250   //%
+#define DEFAULT_PWM				245   //%
 #define	DEFAULT_VHALLF		340  //mv 
 #define DEFAULT_VHALLE		370 //mv 
 #define DEFAULT_CURMOT		100   //ma
