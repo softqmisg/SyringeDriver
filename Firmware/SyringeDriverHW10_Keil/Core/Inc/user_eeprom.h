@@ -17,7 +17,7 @@
 #define EE_ADD_TYPEINDEX	18
 
 
-#define DEFAULT_PWM				25   //%
+#define DEFAULT_PWM				250   //%
 #define	DEFAULT_VHALLF		340  //mv 
 #define DEFAULT_VHALLE		370 //mv 
 #define DEFAULT_CURMOT		100   //ma
@@ -27,7 +27,7 @@
 #define DEFAULT_TIMEINDEX	0
 #define DEFAULT_TYPEINDEX	0
 
-#define MAX_PWM		99
+#define MAX_PWM		995
 #define MIN_PWM		0
 
 extern uint16_t EEValue_PWM;

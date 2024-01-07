@@ -32,7 +32,7 @@ double motorCalcDuty(void)
 	printf("EE Volt:%d,cu Volt:%.1f\n\r",EEValue_VOLBAT,batvolt);	
 	if(batvolt>0)
 	{
-		r=(double)EEValue_VOLBAT*EEValue_PWM/batvolt;
+		r=(double)EEValue_VOLBAT*((double)EEValue_PWM/10.0)/batvolt;
 	}
 	else
 	{

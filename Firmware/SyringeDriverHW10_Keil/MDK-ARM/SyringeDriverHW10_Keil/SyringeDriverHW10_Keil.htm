@@ -3,9 +3,9 @@
 <title>Static Call Graph - [SyringeDriverHW10_Keil\SyringeDriverHW10_Keil.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image SyringeDriverHW10_Keil\SyringeDriverHW10_Keil.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Sat Oct 21 15:50:37 2023
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Sun Jan  7 08:56:53 2024
 <BR><P>
-<H3>Maximum Stack Usage =        336 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        344 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 __rt_entry_main &rArr; main &rArr; gotoStopMode &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 <P>
@@ -258,7 +258,7 @@ Global Symbols
 <P><STRONG><a name="[165]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[52]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 336 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 344 + Unknown Stack Size
 <LI>Call Chain = __rt_entry_main &rArr; main &rArr; gotoStopMode &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1592,8 +1592,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_TIM3_Init
 </UL>
 
-<P><STRONG><a name="[d9]"></a>HAL_TIM_OC_DelayElapsedCallback</STRONG> (Thumb, 436 bytes, Stack size 8 bytes, user_buzzer.o(.text.HAL_TIM_OC_DelayElapsedCallback))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = HAL_TIM_OC_DelayElapsedCallback &rArr; HAL_TIM_OC_Stop_IT
+<P><STRONG><a name="[d9]"></a>HAL_TIM_OC_DelayElapsedCallback</STRONG> (Thumb, 412 bytes, Stack size 16 bytes, user_buzzer.o(.text.HAL_TIM_OC_DelayElapsedCallback))
+<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = HAL_TIM_OC_DelayElapsedCallback &rArr; HAL_TIM_OC_Stop_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_OC_Stop_IT
 <LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Stop
@@ -1943,7 +1943,7 @@ Global Symbols
 <LI><a href="#[ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;checkingSystem
 </UL>
 
-<P><STRONG><a name="[ff]"></a>checkingSystem</STRONG> (Thumb, 476 bytes, Stack size 24 bytes, main.o(.text.checkingSystem))
+<P><STRONG><a name="[ff]"></a>checkingSystem</STRONG> (Thumb, 484 bytes, Stack size 24 bytes, main.o(.text.checkingSystem))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160 + Unknown Stack Size
 <LI>Call Chain = checkingSystem &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -2093,8 +2093,8 @@ Global Symbols
 <LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gotoStopMode
 </UL>
 
-<P><STRONG><a name="[53]"></a>main</STRONG> (Thumb, 4924 bytes, Stack size 120 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 336 + Unknown Stack Size
+<P><STRONG><a name="[53]"></a>main</STRONG> (Thumb, 5308 bytes, Stack size 128 bytes, main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 344 + Unknown Stack Size
 <LI>Call Chain = main &rArr; gotoStopMode &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADCEx_Calibration_Start
@@ -2148,6 +2148,7 @@ Global Symbols
 <LI><a href="#[106]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EE_ReadVariable
 <LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EE_Init
 <LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2d
+<LI><a href="#[127]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ddiv
 <LI><a href="#[104]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dcmplt
 <LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dcmple
 <LI><a href="#[121]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dcmpge
@@ -2159,7 +2160,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[122]"></a>motorCalcDuty</STRONG> (Thumb, 108 bytes, Stack size 24 bytes, user_motor.o(.text.motorCalcDuty))
+<P><STRONG><a name="[122]"></a>motorCalcDuty</STRONG> (Thumb, 116 bytes, Stack size 24 bytes, user_motor.o(.text.motorCalcDuty))
 <BR><BR>[Stack]<UL><LI>Max Depth = 168 + Unknown Stack Size
 <LI>Call Chain = motorCalcDuty &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -2207,7 +2208,7 @@ Global Symbols
 <LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gotoStopMode
 </UL>
 
-<P><STRONG><a name="[10f]"></a>muteTone</STRONG> (Thumb, 34 bytes, Stack size 8 bytes, user_buzzer.o(.text.muteTone))
+<P><STRONG><a name="[10f]"></a>muteTone</STRONG> (Thumb, 44 bytes, Stack size 8 bytes, user_buzzer.o(.text.muteTone))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = muteTone &rArr; HAL_TIM_OC_Stop_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_OC_Stop_IT
@@ -2216,7 +2217,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gotoStopMode
 </UL>
 
-<P><STRONG><a name="[100]"></a>playTone</STRONG> (Thumb, 80 bytes, Stack size 8 bytes, user_buzzer.o(.text.playTone))
+<P><STRONG><a name="[100]"></a>playTone</STRONG> (Thumb, 82 bytes, Stack size 8 bytes, user_buzzer.o(.text.playTone))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = playTone
 </UL>
 <BR>[Calls]<UL><LI><a href="#[12b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_GenerateEvent
@@ -2227,7 +2228,7 @@ Global Symbols
 <LI><a href="#[ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;checkingSystem
 </UL>
 
-<P><STRONG><a name="[109]"></a>playToneReverse</STRONG> (Thumb, 218 bytes, Stack size 8 bytes, user_buzzer.o(.text.playToneReverse))
+<P><STRONG><a name="[109]"></a>playToneReverse</STRONG> (Thumb, 222 bytes, Stack size 8 bytes, user_buzzer.o(.text.playToneReverse))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = playToneReverse
 </UL>
 <BR>[Calls]<UL><LI><a href="#[12b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_GenerateEvent
@@ -2348,7 +2349,8 @@ Global Symbols
 <P><STRONG><a name="[127]"></a>__aeabi_ddiv</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, ddiv.o(x$fpl$ddiv))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = __aeabi_ddiv
 </UL>
-<BR>[Called By]<UL><LI><a href="#[123]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;motorStart
+<BR>[Called By]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[123]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;motorStart
 <LI><a href="#[122]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;motorCalcDuty
 </UL>
 

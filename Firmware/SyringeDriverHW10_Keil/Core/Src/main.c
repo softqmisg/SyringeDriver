@@ -207,6 +207,8 @@ int main(void)
 	uint8_t first_presstime=1;
 	uint8_t NE_AlarmCnt=0;
 	uint8_t NE_AlarmIndex=0;
+	uint8_t NE_startCountStandby=0;
+	uint8_t	NE_CounterStandby=0;
 	uint8_t ES_AlarmCnt=0;
 	
   /* USER CODE END 1 */
@@ -312,6 +314,8 @@ int main(void)
 			case WakeupState:
 				if(isKeyHold(KeyPower))
 				{
+					sysTick_flag2s=0;sysTick_cnt2s=0;
+					while(!sysTick_flag2s);
 					playTone(toneBeep);
 					machineState=UpState;
 					eepromReadValues();
@@ -351,8 +355,13 @@ int main(void)
 					machineState=SetupState;
 					submenuIndex=0;
 					tmp_uint16t=EEValue_PWM;
-					sprintf(msg,"%02d",tmp_uint16t);
+					sprintf(msg,"%02d",tmp_uint16t/10);
 					printSegs(msg,1);
+					if(tmp_uint16t%10==0)
+						printDPSegs("  ");
+					else
+						printDPSegs(" .");
+					
 				}
 				else if(mPinRead(KeyType_GPIO_Port,KeyType_Pin)==GPIO_PIN_RESET && mPinRead(KeySS_GPIO_Port,KeySS_Pin)==GPIO_PIN_RESET )
 				{
@@ -417,7 +426,7 @@ int main(void)
 					GoStandbyCnt=DELAY_GOSTANDBY;
 					rtc_flag5s=0;
 					rtc_cnt5s=0;
-					printSegs("bO",1);
+					printSegs("8O",1);
 				}
 				if(isKeyPress(KeyTime))
 				{
@@ -492,12 +501,14 @@ int main(void)
 					HAL_RTC_SetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
 					HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);
 					hallON();
-					rtc_flag2s=0;rtc_cnt2s=0;
-					while(!rtc_flag2s);	
+//					rtc_flag2s=0;rtc_cnt2s=0;
+//					while(!rtc_flag2s);	
 					rtc_flag2s=0;	
 					motorErrNum=0;
 					NE_AlarmCnt=0;
 					NE_AlarmIndex=0;
+					NE_startCountStandby=0;
+					NE_CounterStandby=0;
 					ES_AlarmCnt=0;
 					awu_flag=0;
 					keyw_flag=0;
@@ -520,6 +531,7 @@ int main(void)
 					HAL_Delay(50);
 					if(hallIsEnd())
 					{
+						NE_startCountStandby=1;
 						if(NE_AlarmIndex<MAX_NE_ALARM_INDEX)
 						{
 							NE_AlarmIndex++;
@@ -557,45 +569,57 @@ int main(void)
 					while(!sysTick_flag2s && prevSwitchFB==mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin));
 					motorStop();
 					setLED(LedSS,0);
-					if(prevSwitchFB!=mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin))
+					if(NE_startCountStandby)
 					{
-						motorErrNum=0;
-						runState=RunOffState;
-						activeAlarm=1;gotoStopMode();
-						if(systemError==ERR_ES)	systemError=ERR_NONE;
+						NE_CounterStandby++;
+					}
+					if(NE_CounterStandby>=MAX_NE_STANDBY_CNT)
+					{
+						machineState=StandbyState;
 					}
 					else
 					{
-						playTone(toneAlarm);
-						printSegs("E5",0);						
-						setLED(LedAlarm,1);
-						sysTick_flag1s=0;sysTick_cnt1s=0;
-						while(!sysTick_flag1s);
-						setLED(LedAlarm,0);
-						motorErrNum++;
-						ES_AlarmCnt++;
-						if(motorErrNum>=MAX_MotorErrNum)
+						if(prevSwitchFB!=mPinRead(SwitchFB_GPIO_Port,SwitchFB_Pin))
 						{
-							if(systemError==ERR_NE)
+							motorErrNum=0;
+							runState=RunOffState;
+							activeAlarm=1;gotoStopMode();
+							if(systemError==ERR_ES)	systemError=ERR_NONE;
+						}
+						else
+						{
+							playTone(toneAlarm);
+							printSegs("E5",0);						
+							setLED(LedAlarm,1);
+							sysTick_flag1s=0;sysTick_cnt1s=0;
+							while(!sysTick_flag1s);
+							//while(isplayingTone());
+							setLED(LedAlarm,0);
+							motorErrNum++;
+							ES_AlarmCnt++;
+							if(motorErrNum>=MAX_MotorErrNum)
 							{
-								setLED(LedAlarm,1);
-								printf("error!exceed maximum motor error and NE active.\r\n");
-								machineState=StandbyState;
+								if(systemError==ERR_NE)
+								{
+									setLED(LedAlarm,1);
+									printf("error!exceed maximum motor error and NE active.\r\n");
+									machineState=StandbyState;
+								}
+								else
+								{
+									systemError=ERR_ES;
+									printf("error!exceed maximum motor error but NE not active.\r\n");
+									runState=RunOffState;
+									activeAlarm=0;gotoStopMode();
+								}
 							}
 							else
 							{
 								systemError=ERR_ES;
-								printf("error!exceed maximum motor error but NE not active.\r\n");
+								printf("error!motor err %d\r\n",motorErrNum);
 								runState=RunOffState;
-								activeAlarm=0;gotoStopMode();
+								activeAlarm=1;gotoStopMode();							
 							}
-						}
-						else
-						{
-							systemError=ERR_ES;
-							printf("error!motor err %d\r\n",motorErrNum);
-							runState=RunOffState;
-							activeAlarm=1;gotoStopMode();							
 						}
 					}
 				}
@@ -616,21 +640,17 @@ int main(void)
 							{
 								playTone(toneAlarmNE);
 								printSegs(systemErrorMsg[systemError],0);
-								setLED(LedAlarm,1);
-								sysTick_flag1s=0;sysTick_cnt1s=0;
-								while(!sysTick_flag1s);
-								setLED(LedAlarm,0);
 							}
 							else if(NE_AlarmCnt==2*MAX_NE_ALARM_CNT)
 							{
 								playTone(toneAlarmNE);
 								printSegs(systemErrorMsg[systemError],0);
+								systemError=ERR_NONE;
+							}
 								setLED(LedAlarm,1);
 								sysTick_flag1s=0;sysTick_cnt1s=0;
 								while(!sysTick_flag1s);
 								setLED(LedAlarm,0);
-								systemError=ERR_NONE;
-							}
 						}
 						if(systemError==ERR_ES)
 						{
@@ -639,24 +659,21 @@ int main(void)
 							{
 								playTone(toneAlarm);
 								printSegs(systemErrorMsg[systemError],0);
-								setLED(LedAlarm,1);
-								sysTick_flag1s=0;sysTick_cnt1s=0;
-								while(!sysTick_flag1s);
-								setLED(LedAlarm,0);
 							}
 							else if(ES_AlarmCnt==2*MAX_ES_ALARM_CNT)
 							{
 								playTone(toneAlarm);
 								printSegs(systemErrorMsg[systemError],0);
-								setLED(LedAlarm,1);
-								sysTick_flag1s=0;sysTick_cnt1s=0;
-								while(!sysTick_flag1s);
-								setLED(LedAlarm,0);
 								systemError=ERR_NONE;
 							}
+							setLED(LedAlarm,1);
+							sysTick_flag1s=0;sysTick_cnt1s=0;
+							while(!sysTick_flag1s);
+							setLED(LedAlarm,0);
 						}
 						gotoStopMode(); //activeAlarm save its previous value
 					}
+					
 					if(isKeyPress(KeyPower))
 					{
 						keyw_flag=0;
@@ -676,6 +693,12 @@ int main(void)
 						runState=RunOffState;
 						gotoStopMode();//activeAlarm save its previous value
 					}
+					if(isKeyHold(KeyPower))
+					{
+						keyw_flag=0;
+						runState=RunOffState;
+						gotoStopMode();
+					}
 					if(isKeyHold(KeySS))
 					{
 						__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
@@ -689,6 +712,12 @@ int main(void)
 						submenuIndex=0;
 						sprintf(msg,"%02d",syringeTimes[EEValue_TIMEINDEX]);
 						printSegs(msg,0);
+					}
+					if(isKeyPress(KeySS))
+					{
+						keyw_flag=0;
+						runState=RunOffState;
+						gotoStopMode();
 					}
 				}
 				break;
@@ -710,45 +739,64 @@ int main(void)
 						if(isKeyHold(KeyTime)&& !motorIsStart())
 						{
 							playTone(toneBeep);
-							tmp_uint16t+=10;
+							tmp_uint16t+=100;
 							if(tmp_uint16t>MAX_PWM)
 								tmp_uint16t=MIN_PWM;
-							sprintf(msg,"%02d",tmp_uint16t);
+							sprintf(msg,"%02d",tmp_uint16t/10);
 							printSegs(msg,1);
+							if(tmp_uint16t%10==0)
+								printDPSegs("  ");
+							else
+								printDPSegs(" .");
 						}						
 						if(isKeyPress(KeyTime)&& !motorIsStart())
 						{
 							playTone(toneBeep);
-							tmp_uint16t++;
+							tmp_uint16t+=5;
 							if(tmp_uint16t>MAX_PWM)
 								tmp_uint16t=MIN_PWM;
-							sprintf(msg,"%02d",tmp_uint16t);
+							sprintf(msg,"%02d",tmp_uint16t/10);
 							printSegs(msg,1);
+							if(tmp_uint16t%10==0)
+								printDPSegs("  ");
+							else
+								printDPSegs(" .");							
 						}
 						if(isKeyHold(KeyType)&& !motorIsStart())
 						{
 							playTone(toneBeep);
-							if(tmp_uint16t<MIN_PWM+10)
-								tmp_uint16t=MAX_PWM+10;
-							tmp_uint16t-=10;
-							sprintf(msg,"%02d",tmp_uint16t);
+							if(tmp_uint16t<MIN_PWM+100)
+								tmp_uint16t=MAX_PWM+100;
+							tmp_uint16t-=100;
+							sprintf(msg,"%02d",tmp_uint16t/10);
 							printSegs(msg,1);
+							if(tmp_uint16t%10==0)
+								printDPSegs("  ");
+							else
+								printDPSegs(" .");							
 						}						
 						if(isKeyPress(KeyType)&& !motorIsStart())
 						{
 							playTone(toneBeep);
 							if(tmp_uint16t==MIN_PWM)
-								tmp_uint16t=MAX_PWM+1;
-							tmp_uint16t--;
-							sprintf(msg,"%02d",tmp_uint16t);
+								tmp_uint16t=MAX_PWM+5;
+							tmp_uint16t-=5;
+							sprintf(msg,"%02d",tmp_uint16t/10);
 							printSegs(msg,1);
+							if(tmp_uint16t%10==0)
+								printDPSegs("  ");
+							else
+								printDPSegs(" .");							
 						}
 						if(isKeyPress(KeySS))
 						{
 							playTone(toneBeep);
-							sprintf(msg,"%02d",tmp_uint16t);
+							sprintf(msg,"%02d",tmp_uint16t/10);
 							printSegs(msg,0);
-							printDPSegs(" .");
+							if(tmp_uint16t%10==0)
+								printDPSegs(". ");
+							else
+								printDPSegs("..");							
 							if(motorIsStart()) //motor ON->OFF
 							{
 								motorStop();
@@ -756,7 +804,7 @@ int main(void)
 							}
 							else //motor OFF->ON
 							{
-								motorStart((double)tmp_uint16t);
+								motorStart((double)tmp_uint16t/10.0);
 								setLED(LedSS,1);							
 							}
 						}						
@@ -823,8 +871,12 @@ int main(void)
 							hallOFF();
 							submenuIndex=0;
 							tmp_uint16t=EEValue_PWM;
-							sprintf(msg,"%02d",tmp_uint16t);
+							sprintf(msg,"%02d",tmp_uint16t/10);
 							printSegs(msg,1);							
+							if(tmp_uint16t%10==0)
+								printDPSegs("  ");
+							else
+								printDPSegs(" .");
 						}						
 						break;						
 				}

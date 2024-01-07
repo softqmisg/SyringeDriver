@@ -22,4 +22,6 @@
 void playTone(uint16_t *tones);
 void playToneReverse(uint16_t *tones);
 void muteTone(void);
+uint8_t isplayingTone(void);
+
 #endif

@@ -17,6 +17,7 @@
 
 #define MAX_NE_ALARM_INDEX	2
 #define MAX_NE_ALARM_CNT	4 //maximum NE alarm counter
+#define MAX_NE_STANDBY_CNT	50
 #define MAX_ES_ALARM_CNT	4 //maximum ES alarm counter
 
 extern uint16_t syringeTypes[];

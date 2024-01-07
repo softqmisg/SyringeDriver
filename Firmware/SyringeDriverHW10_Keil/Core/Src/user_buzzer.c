@@ -2,7 +2,7 @@
 /****************************************************************************/
 uint16_t *local_tone;
 static __IO uint16_t local_index=0,local_length;
-static __IO int8_t local_forward=1;
+static __IO int8_t local_forward=1,local_isplaying=0;
 
 void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -26,6 +26,7 @@ uint32_t frq_pwm_value;
 			{
 				HAL_TIM_PWM_Stop(&BUZZERFREQ_TIMER,BUZZERFREQ_CHANNEL);
 				HAL_TIM_OC_Stop_IT(&BUZZERPERIOD_TIMER,BUZZERPERIOD_CHANNEL);
+				local_isplaying=0;
 			}
 			else
 			{
@@ -56,6 +57,7 @@ uint32_t frq_pwm_value;
 			{
 				HAL_TIM_PWM_Stop(&BUZZERFREQ_TIMER,BUZZERFREQ_CHANNEL);
 				HAL_TIM_OC_Stop_IT(&BUZZERPERIOD_TIMER,BUZZERPERIOD_CHANNEL);
+				local_isplaying=0;
 			}
 			else
 			{
@@ -85,10 +87,17 @@ uint32_t frq_pwm_value;
 }
 /**
 */
+uint8_t isplayingTone(void)
+{
+	return local_isplaying;
+}
+/**
+*/
 void muteTone(void)
 {
 	HAL_TIM_PWM_Stop(&BUZZERFREQ_TIMER,BUZZERFREQ_CHANNEL);
 	HAL_TIM_OC_Stop_IT(&BUZZERPERIOD_TIMER,BUZZERPERIOD_CHANNEL);
+	local_isplaying=0;
 }
 /**
 	freq=in HZ
@@ -100,7 +109,7 @@ void playTone(uint16_t *tones)
 	local_tone=tones;
 	local_index=0;
 	local_forward=1;
-	
+	local_isplaying=1;
 	__HAL_TIM_SET_AUTORELOAD(&BUZZERFREQ_TIMER,(uint16_t)0);
 	__HAL_TIM_SET_COMPARE(&BUZZERFREQ_TIMER,BUZZERFREQ_CHANNEL,0);
 	__HAL_TIM_SET_COUNTER(&BUZZERFREQ_TIMER, 0);//init timer counter
@@ -114,6 +123,7 @@ void playToneReverse(uint16_t *tones)
 {
 	local_forward=0;
 	local_index=0;
+	local_isplaying=1;
 	while(tones[local_index]!=TONES_END && tones[local_index]!=TONES_REPEAT)
 	{
 		local_index+=2;
