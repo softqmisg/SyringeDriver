@@ -148,6 +148,8 @@ void checkingSystem(void)
 {
 
 	char msg[3];
+	sysTick_flag2s=0;sysTick_cnt2s=0;
+	while(!sysTick_flag2s);
 		playTone(toneBeep);
 	setLED(LedBat,1);
 	setLED(LedAlarm,1);
@@ -314,8 +316,6 @@ int main(void)
 			case WakeupState:
 				if(isKeyHold(KeyPower))
 				{
-					sysTick_flag2s=0;sysTick_cnt2s=0;
-					while(!sysTick_flag2s);
 					playTone(toneBeep);
 					machineState=UpState;
 					eepromReadValues();
