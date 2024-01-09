@@ -207,12 +207,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	
 	uint16_t *tones[]={tonePowerWake,toneKeyPress,toneBeep,toneAlarm,toneSave,toneEnterSetup,toneStartRun};
 	uint8_t tonenum=0;
 sprintf(msg,"%02d",tonenum+1);
 printSegs(msg,0);
-	playToneReverse(tones[tonenum]);
+//	playToneReverse(tones[tonenum]);
+	playTone(toneStopRun);
 	while (1)
 	{
 		keypadRead();
@@ -221,8 +221,10 @@ printSegs(msg,0);
     /* USER CODE BEGIN 3 */
 		if(isKeyHold(KeySS))
 		{
-			muteTone();
-		}if(isKeyPress(KeyPower))
+			//muteTone();
+			playTone(toneStopRun);
+		}
+		if(isKeyPress(KeyPower))
 		{
 			playToneReverse(tones[tonenum]);
 		}

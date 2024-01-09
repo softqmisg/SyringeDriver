@@ -255,6 +255,7 @@
 #define TONESNUMBER 7
 
 extern uint16_t toneStartRun[];
+extern uint16_t toneStopRun[];
 extern uint16_t tonePowerWake[];
 extern uint16_t toneKeyPress[];
 extern uint16_t toneAlarm[];
