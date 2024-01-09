@@ -512,6 +512,7 @@ int main(void)
 					ES_AlarmCnt=0;
 					awu_flag=0;
 					keyw_flag=0;
+					while(isplayingTone());
 				}
 				if(isKeyHold(KeyPower))
 				{
