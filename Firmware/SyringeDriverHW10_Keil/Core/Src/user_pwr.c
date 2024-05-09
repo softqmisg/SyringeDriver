@@ -15,6 +15,7 @@
 #include "usart.h"
 #include <time.h>
 RTC_TimeTypeDef stampTime;
+volatile int numberofwakeup=0;
 /*-----------------------------------------------------*/
 void setAlarm(RTC_AlarmTypeDef *sAlarm,RTC_TimeTypeDef stamp, uint8_t delay)
 {
@@ -78,16 +79,24 @@ __STATIC_INLINE void SYSCLKConfig_FromSTOP(void)
 /*-----------------------------------------------------*/
 uint8_t rtcCheckTime(RTC_HandleTypeDef *hrtc,uint16_t targetsec)
 {
-	uint16_t cursec;
-	RTC_TimeTypeDef sTime;
-	RTC_DateTypeDef sDate;
-	HAL_RTC_WaitForSynchro(hrtc);
-	HAL_RTC_GetTime(hrtc,&sTime,RTC_FORMAT_BIN);
-	HAL_RTC_GetDate(hrtc,&sDate,RTC_FORMAT_BIN);
-	cursec=(uint16_t) sTime.Hours*3600+(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;//(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;//
-	if(cursec>=targetsec)
+//	uint16_t cursec;
+//	RTC_TimeTypeDef sTime;
+//	RTC_DateTypeDef sDate;
+//	HAL_RTC_WaitForSynchro(hrtc);
+//	HAL_RTC_GetTime(hrtc,&sTime,RTC_FORMAT_BIN);
+//	HAL_RTC_GetDate(hrtc,&sDate,RTC_FORMAT_BIN);
+//	cursec=(uint16_t) sTime.Hours*3600+(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;//(uint16_t) sTime.Minutes*60+(uint16_t) sTime.Seconds;//
+//	if(cursec>=targetsec)
+//		return 1;
+//	return 0;
+		numberofwakeup++;
+	if(numberofwakeup>=targetsec/3)
+	{
+		numberofwakeup=0;
 		return 1;
+	}
 	return 0;
+	
 }
 /*-----------------------------------------------------*/
 __IO uint8_t awu_flag=0;
