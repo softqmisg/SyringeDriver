@@ -672,7 +672,7 @@ int main(void)
 							while(!sysTick_flag1s);
 							setLED(LedAlarm,0);
 						}
-						gotoStopMode(); //activeAlarm save its previous value
+						activeAlarm=1;gotoStopMode(); //activeAlarm save its previous value
 					}
 					
 					if(isKeyPress(KeyPower))

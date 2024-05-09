@@ -14,8 +14,7 @@
 #include "user_sevensegment.h"
 #include "usart.h"
 #include <time.h>
-RTC_TimeTypeDef stampTime;
-volatile int numberofwakeup=0;
+RTC_TimeTypeDef stampTime={0};
 /*-----------------------------------------------------*/
 void setAlarm(RTC_AlarmTypeDef *sAlarm,RTC_TimeTypeDef stamp, uint8_t delay)
 {
@@ -77,6 +76,8 @@ __STATIC_INLINE void SYSCLKConfig_FromSTOP(void)
 
 }
 /*-----------------------------------------------------*/
+__IO uint8_t numberofwakeup=0;
+
 uint8_t rtcCheckTime(RTC_HandleTypeDef *hrtc,uint16_t targetsec)
 {
 //	uint16_t cursec;
@@ -90,7 +91,7 @@ uint8_t rtcCheckTime(RTC_HandleTypeDef *hrtc,uint16_t targetsec)
 //		return 1;
 //	return 0;
 		numberofwakeup++;
-	if(numberofwakeup>=targetsec/3)
+	if(numberofwakeup>=(targetsec/3))
 	{
 		numberofwakeup=0;
 		return 1;
@@ -110,10 +111,9 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	runState=RunOffState;
 	if(rtcCheckTime(hrtc,syringWakeups[EEValue_TIMEINDEX][EEValue_TYPEINDEX]))
 	{
-//		awu_flag=1;
 		runState=RunOnState;
 	}
-		HAL_PWR_DisableSleepOnExit();
+	HAL_PWR_DisableSleepOnExit();
 
 }
 /*-----------------------------------------------------*/
@@ -141,7 +141,7 @@ __IO uint32_t index = 0;
 	keypadRead();
 	HAL_Delay(300);
 	muteTone();
-	printf("Bye!\r\n");
+	//printf("Bye!\r\n");
 	keypadRead();
 	MX_GPIO_DeInit();
 	//----------------Init ExtI for wakeup----------------
@@ -179,12 +179,12 @@ __IO uint32_t index = 0;
 		setAlarm(&sAlarm,stampTime,delayAlarwakups[EEValue_TYPEINDEX]); //every 3/3s
 		HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm,RTC_FORMAT_BIN);
 	}
-	printf("\n\r");
+	//printf("\n\r");
 	//---------------------------goto stop--------------------
 	HAL_SuspendTick();
 	HAL_PWR_EnableSleepOnExit();
 	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON,PWR_STOPENTRY_WFI);
-	//---------------------------wakup stop and init peripheral--------------------
+	//---------------------------wakeup stop and init peripheral--------------------
 	HAL_RTC_DeactivateAlarm(&hrtc,RTC_ALARM_A);
 	MX_GPIO_Init();		
 	HAL_ADC_MspInit(&hadc1);
@@ -193,15 +193,18 @@ __IO uint32_t index = 0;
 	keypadRead();
 	initSegs();
 	HAL_RTC_WaitForSynchro(&hrtc);
-	printf("Hi!\r\n");
+	//printf("Hi!\r\n");
 	__HAL_RTC_ALARM_ENABLE_IT(&hrtc,RTC_IT_SEC);
 	if(awu_flag)
 	{
 		if(runState==RunOnState)
 		{
 			awu_flag=0;
-			printf("===========================\r\n");
-			printf("AWU timeout Run On state!\r\n");
+		//	printf("===========================\r\n");
+		//	printf("AWU timeout Run On state!\r\n");
+			sTime.Hours=0;sTime.Minutes=0;sTime.Seconds=0;
+			sDate.Year=0x0;sDate.Date=0x01;sDate.Month=RTC_MONTH_JANUARY;sDate.WeekDay=RTC_WEEKDAY_MONDAY;
+	
 			HAL_RTC_SetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
 			HAL_RTC_SetDate(&hrtc,&sDate,RTC_FORMAT_BIN);			
 			hallON();

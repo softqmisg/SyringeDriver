@@ -3,11 +3,11 @@
 <title>Static Call Graph - [SyringeDriverHW10_Keil\SyringeDriverHW10_Keil.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image SyringeDriverHW10_Keil\SyringeDriverHW10_Keil.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Thu May  9 11:11:06 2024
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Thu May  9 15:23:06 2024
 <BR><P>
-<H3>Maximum Stack Usage =        344 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
-__rt_entry_main &rArr; main &rArr; gotoStopMode &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
+_printf_f &rArr; _printf_fp_dec &rArr; _printf_fp_dec_real &rArr; _fp_digits &rArr; _btod_etento &rArr; _btod_emul &rArr; _e2e
 <P>
 <H3>
 Functions with no stack information
@@ -258,8 +258,8 @@ Global Symbols
 <P><STRONG><a name="[166]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[52]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 344 + Unknown Stack Size
-<LI>Call Chain = __rt_entry_main &rArr; main &rArr; gotoStopMode &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
+<BR><BR>[Stack]<UL><LI>Max Depth = 300 + Unknown Stack Size
+<LI>Call Chain = __rt_entry_main &rArr; main &rArr; gotoStopMode &rArr; MX_GPIO_Init &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exit
@@ -406,7 +406,6 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hallIsEnd
 <LI><a href="#[122]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;motorCalcDuty
-<LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gotoStopMode
 </UL>
 
 <P><STRONG><a name="[5b]"></a>__2sprintf</STRONG> (Thumb, 34 bytes, Stack size 32 bytes, noretval__2sprintf.o(.text))
@@ -461,7 +460,6 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[108]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gotoStandbyMode
-<LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gotoStopMode
 </UL>
 
 <P><STRONG><a name="[75]"></a>__aeabi_memclr4</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, rt_memclr_w.o(.text))
@@ -1358,7 +1356,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_IRQHandler
 </UL>
 
-<P><STRONG><a name="[c1]"></a>HAL_RTC_AlarmAEventCallback</STRONG> (Thumb, 216 bytes, Stack size 8 bytes, user_pwr.o(.text.HAL_RTC_AlarmAEventCallback))
+<P><STRONG><a name="[c1]"></a>HAL_RTC_AlarmAEventCallback</STRONG> (Thumb, 222 bytes, Stack size 8 bytes, user_pwr.o(.text.HAL_RTC_AlarmAEventCallback))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = HAL_RTC_AlarmAEventCallback
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PWR_DisableSleepOnExit
@@ -1993,9 +1991,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[10d]"></a>gotoStopMode</STRONG> (Thumb, 836 bytes, Stack size 72 bytes, user_pwr.o(.text.gotoStopMode))
-<BR><BR>[Stack]<UL><LI>Max Depth = 216 + Unknown Stack Size
-<LI>Call Chain = gotoStopMode &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
+<P><STRONG><a name="[10d]"></a>gotoStopMode</STRONG> (Thumb, 820 bytes, Stack size 80 bytes, user_pwr.o(.text.gotoStopMode))
+<BR><BR>[Stack]<UL><LI>Max Depth = 172<LI>Call Chain = gotoStopMode &rArr; MX_GPIO_Init &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_GetDate
 <LI><a href="#[117]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hallON
@@ -2025,8 +2022,6 @@ Global Symbols
 <LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_GetTime
 <LI><a href="#[10f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;muteTone
 <LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
-<LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;puts
-<LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -2091,9 +2086,9 @@ Global Symbols
 <LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gotoStopMode
 </UL>
 
-<P><STRONG><a name="[53]"></a>main</STRONG> (Thumb, 5336 bytes, Stack size 128 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 344 + Unknown Stack Size
-<LI>Call Chain = main &rArr; gotoStopMode &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
+<P><STRONG><a name="[53]"></a>main</STRONG> (Thumb, 5348 bytes, Stack size 128 bytes, main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 300 + Unknown Stack Size
+<LI>Call Chain = main &rArr; gotoStopMode &rArr; MX_GPIO_Init &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADCEx_Calibration_Start
 <LI><a href="#[11e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_FLASH_Unlock
