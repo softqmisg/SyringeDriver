@@ -56,8 +56,12 @@ __STATIC_INLINE void SYSCLKConfig_FromSTOP(void)
   /* Customize process using LL interface to improve the performance 
      (wake-up time from STOP quicker in LL than HAL)*/  
   /* HSE configuration and activation */
+	LL_RCC_LSI_Enable();
+	while(LL_RCC_LSI_IsReady()!=1){};
+		
   LL_RCC_HSI_Enable();
   while(LL_RCC_HSI_IsReady() != 1) {};
+
 
 //  /* Main PLL activation */
 //  LL_RCC_PLL_Enable();
@@ -70,7 +74,11 @@ __STATIC_INLINE void SYSCLKConfig_FromSTOP(void)
   while(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI) 
   {
   };
+	LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
+	LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_2);
+	LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
 	
+	LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSI);
 	LL_RCC_SetADCClockSource(LL_RCC_ADC_CLKSRC_PCLK2_DIV_6);
 
 
